@@ -20,7 +20,7 @@ export const useTasks = () => {
     boardId: string,
     title: string,
     status: TaskStatus,
-    dueDate: number,
+    dueDate: Date,
   ) => {
     const task: Task = {
       id: generateId(),

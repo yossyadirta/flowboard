@@ -7,5 +7,5 @@ export type Task = {
   boardId: string;
   order: number;
   createdAt: number;
-  dueDate: number;
+  dueDate: Date;
 };
