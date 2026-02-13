@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/card";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { PlusIcon } from "lucide-react";
+import { AddTaskModal } from "@/components/task/AddTaskModal";
+import { Button } from "@/components/ui/button";
 
 const TASK_STATUS: {
   title: string;
@@ -46,6 +48,7 @@ type ModalState =
   | { type: "edit-board" }
   | { type: "option-task"; taskId: string }
   | { type: "delete-task"; taskId: string }
+  | { type: "add-task"; status?: TaskStatus | undefined; boardId: string }
   | { type: "edit-task"; data: Task };
 
 const Page = () => {
@@ -55,7 +58,6 @@ const Page = () => {
   const boardId = params.boardId;
   const {
     tasks,
-    addTask,
     deleteTask,
     updateTaskContent,
     updateTaskStatus,
@@ -76,10 +78,6 @@ const Page = () => {
   useEffect(() => {
     handleUpdateMounted();
   }, []);
-
-  const handleAddTask = (status: TaskStatus, dueDate: number) => {
-    addTask(boardId, status, status, dueDate);
-  };
 
   const handleDeleteTask = (id: string) => {
     deleteTask(id);
@@ -175,6 +173,17 @@ const Page = () => {
         </div>
       </div>
       <br />
+      <Button
+        onClick={() => {
+          setModalState({
+            type: "add-task",
+            status: undefined,
+            boardId,
+          });
+        }}
+      >
+        Add New Task
+      </Button>
       <div className="flex gap-12">
         <div className="w-3/4 flex gap-8 flex-col">
           <div className="w-full bg-blue-300">
@@ -242,7 +251,13 @@ const Page = () => {
                     })}
                   <Card
                     className="p-2 flex flex-row gap-2 align-middle cursor-pointer border-0"
-                    onClick={() => handleAddTask(status.id, 0)}
+                    onClick={() => {
+                      setModalState({
+                        type: "add-task",
+                        status: status.id,
+                        boardId,
+                      });
+                    }}
                   >
                     <PlusIcon size={18} className="text-muted-foreground" />
                     <CardDescription>Add New Task</CardDescription>
@@ -285,6 +300,16 @@ const Page = () => {
       <EditBoardModal
         open={modalState.type === "edit-board"}
         data={currentBoard}
+        onClose={() => {
+          setModalState({
+            type: null,
+          });
+        }}
+      />
+      <AddTaskModal
+        open={modalState.type === "add-task"}
+        status={modalState.type === "add-task" ? modalState?.status : undefined}
+        boardId={modalState.type === "add-task" ? modalState?.boardId : ""}
         onClose={() => {
           setModalState({
             type: null,
