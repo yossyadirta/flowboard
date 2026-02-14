@@ -15,6 +15,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { useState } from "react";
 import { TaskStatus } from "@/types/task";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils";
 
 type Props = {
   open: boolean;
@@ -39,7 +40,10 @@ export function AddTaskModal({ open, onClose, status, boardId }: Props) {
   }) => {
     addTask(boardId, title, status, dueDate);
     onClose();
-    toast.success("Task has been added");
+    toast.success("Task has been created", {
+      description: formatDate(new Date(), true),
+      position: "top-center",
+    });
   };
 
   return (

@@ -22,6 +22,7 @@ import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { PlusIcon } from "lucide-react";
 import { AddTaskModal } from "@/components/task/AddTaskModal";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 
 const TASK_STATUS: {
   title: string;
@@ -105,7 +106,10 @@ const Page = () => {
     } else {
       router.push("/board");
     }
-    toast.success("Board has been deleted");
+    toast.success("Board has been deleted", {
+      description: formatDate(new Date(), true),
+      position: "top-center",
+    });
   };
 
   const handleUpdateTaskOrder = (
