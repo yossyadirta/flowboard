@@ -22,12 +22,20 @@ export const useTasks = () => {
     status: TaskStatus,
     dueDate: Date,
   ) => {
+    const sameColumnTasks = tasks.filter(
+      (task) => task.boardId === boardId && task.status === status,
+    );
+    const maxOrder =
+      sameColumnTasks.length > 0
+        ? Math.max(...sameColumnTasks.map((t) => t.order))
+        : -1;
+
     const task: Task = {
       id: generateId(),
       boardId,
       title,
       status,
-      order: 0,
+      order: maxOrder + 1,
       createdAt: Date.now(),
       dueDate,
     };
