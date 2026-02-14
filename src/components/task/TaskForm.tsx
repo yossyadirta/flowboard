@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
 type Props = {
   onSubmit: (values: TaskFormValues) => void;
@@ -54,17 +55,6 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
       dueDate: defaultValues?.dueDate ?? new Date(),
     },
   });
-
-  function formatDate(date: Date | undefined) {
-    if (!date) {
-      return "";
-    }
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  }
 
   useEffect(() => {
     onValidityChange?.(isDirty && isValid);
