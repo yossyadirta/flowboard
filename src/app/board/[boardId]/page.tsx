@@ -23,6 +23,7 @@ import { PlusIcon } from "lucide-react";
 import { AddTaskModal } from "@/components/task/AddTaskModal";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import { EditTaskModal } from "@/components/task/EditTaskModal";
 
 const TASK_STATUS: {
   title: string;
@@ -314,6 +315,15 @@ const Page = () => {
         open={modalState.type === "add-task"}
         status={modalState.type === "add-task" ? modalState?.status : undefined}
         boardId={modalState.type === "add-task" ? modalState?.boardId : ""}
+        onClose={() => {
+          setModalState({
+            type: null,
+          });
+        }}
+      />
+      <EditTaskModal
+        open={modalState.type === "edit-task"}
+        data={modalState.type === "edit-task" ? modalState?.data : null}
         onClose={() => {
           setModalState({
             type: null,
