@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const TASK_STATUS = [
-  { label: "Todo", value: "todo" },
+  { label: "To do", value: "todo" },
   { label: "In Progress", value: "in-progress" },
   { label: "Done", value: "done" },
 ] as const;
