@@ -1,31 +1,30 @@
-"use client"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-import * as React from "react"
-import * as ProgressPrimitive from "@radix-ui/react-progress"
-
-import { cn } from "@/lib/utils"
-
-function Progress({
-  className,
-  value,
-  ...props
-}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
-  return (
-    <ProgressPrimitive.Root
-      data-slot="progress"
-      className={cn(
-        "bg-primary/20 relative h-2 w-full overflow-hidden rounded-full",
-        className
-      )}
-      {...props}
-    >
-      <ProgressPrimitive.Indicator
-        data-slot="progress-indicator"
-        className="bg-primary h-full w-full flex-1 transition-all"
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-      />
-    </ProgressPrimitive.Root>
-  )
+interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
+  value?: number;
+  children?: React.ReactNode;
 }
 
-export { Progress }
+export function Progress({ value = 0, className, children }: ProgressProps) {
+  return (
+    <div className={cn("space-y-2", className)}>
+      {children}
+
+      <div className="relative h-2 w-full bg-muted rounded-full overflow-hidden">
+        <div
+          className="h-full bg-primary transition-all duration-500"
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function ProgressLabel({ children }: { children: React.ReactNode }) {
+  return <div className="text-sm font-medium">{children}</div>;
+}
+
+export function ProgressValue({ value }: { value: number }) {
+  return <div className="text-sm text-muted-foreground">{value}%</div>;
+}
