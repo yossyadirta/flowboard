@@ -22,15 +22,20 @@ import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { PlusIcon } from "lucide-react";
 import { AddTaskModal } from "@/components/task/AddTaskModal";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDueDate } from "@/lib/utils";
 import { EditTaskModal } from "@/components/task/EditTaskModal";
+import {
+  Progress,
+  // ProgressLabel,
+  // ProgressValue,
+} from "@/components/ui/progress";
 
 const TASK_STATUS: {
   title: string;
   id: TaskStatus;
 }[] = [
   {
-    title: "Todo",
+    title: "To do",
     id: "todo",
   },
   {
@@ -131,7 +136,29 @@ const Page = () => {
     return boards.find((item) => item.id === boardId) ?? null;
   }, [boardId, boards]);
 
+  const totalTask =
+    tasks.filter((item) => item.boardId === boardId).length || 0;
+  const totalTodoTask =
+    tasks.filter((item) => item.boardId === boardId && item.status === "todo")
+      .length || 0;
+  const totalInprogressTask =
+    tasks.filter(
+      (item) => item.boardId === boardId && item.status === "in-progress",
+    ).length || 0;
+  const totalDoneTask =
+    tasks.filter((item) => item.boardId === boardId && item.status === "done")
+      .length || 0;
+  const taskProgress =
+    totalTask === 0 ? 0 : Math.round((totalDoneTask / totalTask) * 100);
+
   const { emoji } = BOARD_ICONS_MAP[currentBoard?.icon ?? "briefcase"];
+
+  const formatProgressColor = (percent: number) => {
+    if (percent < 30) return "bg-red-500";
+    if (percent < 70) return "bg-yellow-500";
+
+    return "bg-green-500";
+  };
 
   if (!mounted) {
     return <div>Loading</div>;
@@ -248,6 +275,9 @@ const Page = () => {
                             </CardAction>
                             <CardTitle>{item?.title}</CardTitle>
                           </CardHeader>
+                          <CardDescription>
+                            {formatDueDate(item?.dueDate)}
+                          </CardDescription>
                           {/* <CardFooter>
                         <Button className="w-full">View Event</Button>
                       </CardFooter> */}
@@ -276,6 +306,37 @@ const Page = () => {
           <div className="w-full bg-blue-300">
             <h4>Completion</h4>
           </div>
+          <Card>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Board Completion</span>
+                <span>{taskProgress}%</span>
+              </div>
+              <Progress
+                value={taskProgress}
+                progressColor={formatProgressColor(taskProgress)}
+              />
+            </div>
+            <p>
+              {totalTask - totalDoneTask} of {totalTask} tasks completed
+            </p>
+            <div className="space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span className="text-red-500">To do</span>
+                <span>{totalTodoTask}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-yellow-500">In Progress</span>
+                <span>{totalInprogressTask}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-green-500">Done</span>
+                <span>{totalDoneTask}</span>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
