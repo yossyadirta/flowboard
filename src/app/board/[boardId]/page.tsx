@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useEffectEvent, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useParams } from "next/navigation";
 import { useTasks } from "@/hooks/useTasks";
 import { Task, TaskStatus } from "@/types/task";
@@ -19,16 +25,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SearchIcon, X } from "lucide-react";
 import { AddTaskModal } from "@/components/task/AddTaskModal";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatDueDate } from "@/lib/utils";
 import { EditTaskModal } from "@/components/task/EditTaskModal";
+import { Progress } from "@/components/ui/progress";
 import {
-  Progress,
-  // ProgressLabel,
-  // ProgressValue,
-} from "@/components/ui/progress";
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 const TASK_STATUS: {
   title: string;
@@ -75,16 +82,15 @@ const Page = () => {
   const [modalState, setModalState] = useState<ModalState>({
     type: null,
   });
-
   const [mounted, setMounted] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleUpdateMounted = useEffectEvent(() => {
     setMounted(true);
   });
-
-  useEffect(() => {
-    handleUpdateMounted();
-  }, []);
 
   const handleDeleteTask = (id: string) => {
     deleteTask(id);
@@ -130,6 +136,13 @@ const Page = () => {
     updateTaskContent(task);
   };
 
+  const formatProgressColor = (percent: number) => {
+    if (percent < 30) return "bg-red-500";
+    if (percent < 70) return "bg-yellow-500";
+
+    return "bg-green-500";
+  };
+
   const currentBoard = useMemo(() => {
     if (!boardId) return null;
 
@@ -153,12 +166,47 @@ const Page = () => {
 
   const { emoji } = BOARD_ICONS_MAP[currentBoard?.icon ?? "briefcase"];
 
-  const formatProgressColor = (percent: number) => {
-    if (percent < 30) return "bg-red-500";
-    if (percent < 70) return "bg-yellow-500";
+  const isToday = (date: Date | string) => {
+    const d = new Date(date);
+    const now = new Date();
 
-    return "bg-green-500";
+    return (
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
+    );
   };
+
+  const isOverdue = (date: Date | string) => {
+    const d = new Date(date);
+    const now = new Date();
+
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+    const diffMs = target.getTime() - today.getTime();
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+    return diffDays === -1;
+  };
+
+  const visibleTasks = useMemo(() => {
+    return tasks
+      .filter((item) => boardId === item.boardId)
+      .filter((task) => {
+        if (filter === "today") return isToday(task.dueDate);
+        if (filter === "overdue") return isOverdue(task.dueDate);
+        return true;
+      })
+      .filter((task) =>
+        task.title.toLowerCase().includes(search.toLowerCase()),
+      );
+  }, [filter, search, tasks, boardId]);
+
+  useEffect(() => {
+    handleUpdateMounted();
+  }, []);
 
   if (!mounted) {
     return <div>Loading</div>;
@@ -221,12 +269,43 @@ const Page = () => {
           <div className="w-full bg-blue-300">
             <h4>Tasks</h4>
           </div>
+          <div>
+            <InputGroup>
+              <InputGroupInput
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                ref={inputRef}
+              />
+
+              <InputGroupAddon>
+                <SearchIcon className="text-muted-foreground" />
+              </InputGroupAddon>
+              {search && (
+                <InputGroupAddon align="inline-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearch("");
+                      inputRef.current?.focus();
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                </InputGroupAddon>
+              )}
+            </InputGroup>
+            <Button onClick={() => setFilter("all")}>All</Button>
+            <Button onClick={() => setFilter("today")}>Today</Button>
+            <Button onClick={() => setFilter("overdue")}>Overdue</Button>
+          </div>
           <div className="grid grid-cols-[30%_30%_30%_1fr] gap-4 items-start">
             {TASK_STATUS.map((status) => {
               return (
                 <Card className="p-4 gap-3" key={status.id}>
                   <p>{status.title}</p>
-                  {tasks
+                  {visibleTasks
                     .filter(
                       (item) =>
                         item.status === status.id && boardId === item.boardId,
