@@ -1,5 +1,5 @@
 import { Board } from "@/types/board";
-import { Task, TaskStatus } from "@/types/task";
+import { Task } from "@/types/task";
 
 export const ADD_BOARD = "ADD_BOARD";
 export const DELETE_BOARD = "DELETE_BOARD";
@@ -8,8 +8,7 @@ export const UPDATE_BOARD = "UPDATE_BOARD";
 export const ADD_TASK = "ADD_TASK";
 export const DELETE_TASK = "DELETE_TASK";
 export const UPDATE_TASK_CONTENT = "UPDATE_TASK_CONTENT";
-export const UPDATE_TASK_ORDER = "UPDATE_TASK_ORDER";
-export const UPDATE_TASK_STATUS = "UPDATE_TASK_STATUS";
+export const UPDATE_TASK_DRAG_AND_DROP = "UPDATE_TASK_DRAG_AND_DROP";
 
 /* =========================
   BOARD ACTIONS
@@ -59,20 +58,10 @@ export type UpdateTaskContentAction = {
   };
 };
 
-export type UpdateTaskOrderAction = {
-  type: typeof UPDATE_TASK_ORDER;
+export type UpdateTaskDragAndDropAction = {
+  type: typeof UPDATE_TASK_DRAG_AND_DROP;
   payload: {
-    taskId: string;
-    order: number;
-    status: TaskStatus;
-  };
-};
-
-export type UpdateTaskStatusAction = {
-  type: typeof UPDATE_TASK_STATUS;
-  payload: {
-    taskId: string;
-    status: TaskStatus;
+    tasks: Record<string, Task>;
   };
 };
 
@@ -85,6 +74,5 @@ export type Action =
   | UpdateBoardAction
   | AddTaskAction
   | UpdateTaskContentAction
-  | UpdateTaskOrderAction
   | DeleteTaskAction
-  | UpdateTaskStatusAction;
+  | UpdateTaskDragAndDropAction;

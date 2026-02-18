@@ -4,8 +4,7 @@ import {
   ADD_TASK,
   DELETE_TASK,
   UPDATE_TASK_CONTENT,
-  UPDATE_TASK_ORDER,
-  UPDATE_TASK_STATUS,
+  UPDATE_TASK_DRAG_AND_DROP,
 } from "./actions";
 
 export const taskReducer = (state: AppState, action: Action): AppState => {
@@ -45,40 +44,12 @@ export const taskReducer = (state: AppState, action: Action): AppState => {
       };
     }
 
-    case UPDATE_TASK_ORDER: {
-      const { taskId, status, order } = action.payload;
-      const task = state.tasks[taskId];
-
-      if (!task) return state;
+    case UPDATE_TASK_DRAG_AND_DROP: {
+      const { tasks } = action.payload;
 
       return {
         ...state,
-        tasks: {
-          ...state.tasks,
-          [taskId]: {
-            ...task,
-            status,
-            order,
-          },
-        },
-      };
-    }
-
-    case UPDATE_TASK_STATUS: {
-      const { taskId, status } = action.payload;
-      const task = state.tasks[taskId];
-
-      if (!task) return state;
-
-      return {
-        ...state,
-        tasks: {
-          ...state.tasks,
-          [taskId]: {
-            ...task,
-            status,
-          },
-        },
+        tasks,
       };
     }
 

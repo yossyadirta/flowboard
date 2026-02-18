@@ -7,8 +7,7 @@ import {
   ADD_TASK,
   DELETE_TASK,
   UPDATE_TASK_CONTENT,
-  UPDATE_TASK_ORDER,
-  UPDATE_TASK_STATUS,
+  UPDATE_TASK_DRAG_AND_DROP,
 } from "@/state/actions";
 
 export const useTasks = () => {
@@ -57,27 +56,11 @@ export const useTasks = () => {
     });
   };
 
-  const updateTaskOrder = (
-    taskId: string,
-    order: number,
-    status: TaskStatus,
-  ) => {
+  const updateTaskDragAndDrop = (tasks: Record<string, Task>) => {
     dispatch({
-      type: UPDATE_TASK_ORDER,
+      type: UPDATE_TASK_DRAG_AND_DROP,
       payload: {
-        taskId,
-        order,
-        status,
-      },
-    });
-  };
-
-  const updateTaskStatus = (taskId: string, status: TaskStatus) => {
-    dispatch({
-      type: UPDATE_TASK_STATUS,
-      payload: {
-        taskId,
-        status,
+        tasks,
       },
     });
   };
@@ -95,8 +78,7 @@ export const useTasks = () => {
     tasks,
     addTask,
     updateTaskContent,
-    updateTaskOrder,
-    updateTaskStatus,
+    updateTaskDragAndDrop,
     deleteTask,
   };
 };
