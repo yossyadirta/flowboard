@@ -17,18 +17,12 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import { useRouter } from "next/navigation";
 import { EditBoardModal } from "@/components/board/EditBoardModal";
 import { toast } from "sonner";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
-import { PlusIcon, SearchIcon, X } from "lucide-react";
+import { SearchIcon, X } from "lucide-react";
 import { AddTaskModal } from "@/components/task/AddTaskModal";
 import { Button } from "@/components/ui/button";
-import { formatDate, formatDueDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { EditTaskModal } from "@/components/task/EditTaskModal";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -36,6 +30,9 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { DragDropProvider, useDroppable } from "@dnd-kit/react";
+import TaskColumn from "@/components/task/TaskColumn";
+import { ModalState } from "@/types/state";
 
 const TASK_STATUS: {
   title: string;
@@ -55,28 +52,12 @@ const TASK_STATUS: {
   },
 ];
 
-type ModalState =
-  | { type: null }
-  | { type: "option-board" }
-  | { type: "delete-board" }
-  | { type: "edit-board" }
-  | { type: "option-task"; taskId: string }
-  | { type: "delete-task"; taskId: string }
-  | { type: "add-task"; status?: TaskStatus | undefined; boardId: string }
-  | { type: "edit-task"; data: Task };
-
 const Page = () => {
   const params = useParams<{ boardId: string }>();
   const router = useRouter();
 
   const boardId = params.boardId;
-  const {
-    tasks,
-    deleteTask,
-    updateTaskContent,
-    updateTaskStatus,
-    updateTaskOrder,
-  } = useTasks();
+  const { tasks, deleteTask, updateTaskDragAndDrop } = useTasks();
   const { boards, deleteBoard } = useBoards();
 
   const [modalState, setModalState] = useState<ModalState>({
@@ -94,10 +75,6 @@ const Page = () => {
 
   const handleDeleteTask = (id: string) => {
     deleteTask(id);
-  };
-
-  const handleUpdateTaskStatus = (id: string, status: TaskStatus) => {
-    updateTaskStatus(id, "done");
   };
 
   const getNextBoardId = () => {
@@ -122,18 +99,6 @@ const Page = () => {
       description: formatDate(new Date(), true),
       position: "top-center",
     });
-  };
-
-  const handleUpdateTaskOrder = (
-    id: string,
-    order: number,
-    status: TaskStatus,
-  ) => {
-    updateTaskOrder(id, order + 1, status);
-  };
-
-  const handleUpdateTaskContent = (task: Task) => {
-    updateTaskContent(task);
   };
 
   const formatProgressColor = (percent: number) => {
@@ -211,6 +176,98 @@ const Page = () => {
   if (!mounted) {
     return <div>Loading</div>;
   }
+
+  function recalculateOrder(tasks: Task[]) {
+    // Reset ulang order berdasarkan posisi array saat ini
+    return tasks.map((task, index) => ({
+      ...task,
+      order: index + 1, // order dimulai dari 1
+    }));
+  }
+
+  const handleDragEnd = (event) => {
+    const { source, target } = event.operation;
+    // Kalau drop di luar droppable area → abaikan
+    if (!target) return;
+
+    const sourceId = source.id;
+    const targetId = target.id;
+
+    // Kalau drop ke dirinya sendiri → tidak perlu apa-apa
+    if (sourceId === targetId) return;
+
+    // Ambil task langsung dari record (lookup O(1))
+    const sourceTask = tasks.find((item) => item.id === sourceId);
+    const targetTask = tasks.find((item) => item.id === targetId);
+
+    // Safety check
+    if (!sourceTask || !targetTask) return;
+
+    const sourceColumn = sourceTask.status;
+    const targetColumn = targetTask.status;
+    const boardId = sourceTask.boardId;
+
+    // Ambil semua task di column asal dalam board yang sama
+    const sourceColumnTasks = tasks
+      .filter((t) => t.boardId === boardId && t.status === sourceColumn)
+      .sort((a, b) => a.order - b.order);
+
+    // Kalau beda column, ambil juga column target
+    const targetColumnTasks =
+      sourceColumn === targetColumn
+        ? sourceColumnTasks
+        : tasks
+            .filter((t) => t.boardId === boardId && t.status === targetColumn)
+            .sort((a, b) => a.order - b.order);
+
+    console.log({ sourceColumnTasks, targetColumnTasks });
+
+    // Cari posisi lama dan posisi target
+    const sourceIndex = sourceColumnTasks.findIndex((t) => t.id === sourceId);
+
+    const targetIndex = targetColumnTasks.findIndex((t) => t.id === targetId);
+
+    // ===============================
+    // CASE 1: Reorder dalam column yang sama
+    // ===============================
+    if (sourceColumn === targetColumn) {
+      // Hapus task dari posisi lama
+      const [moved] = sourceColumnTasks.splice(sourceIndex, 1);
+
+      // Masukkan ke posisi baru
+      sourceColumnTasks.splice(targetIndex, 0, moved);
+
+      // Reset ulang order supaya konsisten
+      const updatedColumn = recalculateOrder(sourceColumnTasks);
+      console.log({ updatedColumn }, "<< same col");
+
+      updateTaskDragAndDrop(updatedColumn);
+
+      return;
+    }
+
+    // ===============================
+    // CASE 2: Pindah ke column berbeda
+    // ===============================
+
+    // Hapus dari column lama
+    const [moved] = sourceColumnTasks.splice(sourceIndex, 1);
+
+    // Update status task
+    const updatedMoved = {
+      ...moved,
+      status: targetColumn,
+    };
+
+    // Masukkan ke column baru
+    targetColumnTasks.splice(targetIndex, 0, updatedMoved);
+
+    // Reset ulang order di kedua column
+    const updatedSource = recalculateOrder(sourceColumnTasks);
+    const updatedTarget = recalculateOrder(targetColumnTasks);
+
+    updateTaskDragAndDrop([...updatedSource, ...updatedTarget]);
+  };
 
   return (
     <div>
@@ -301,84 +358,20 @@ const Page = () => {
             <Button onClick={() => setFilter("overdue")}>Overdue</Button>
           </div>
           <div className="grid grid-cols-[30%_30%_30%_1fr] gap-4 items-start">
-            {TASK_STATUS.map((status) => {
-              return (
-                <Card className="p-4 gap-3" key={status.id}>
-                  <p>{status.title}</p>
-                  {visibleTasks
-                    .filter(
-                      (item) =>
-                        item.status === status.id && boardId === item.boardId,
-                    )
-                    .sort((a, b) => a.order - b.order)
-                    .map((item) => {
-                      return (
-                        <Card className="p-4 cursor-pointer" key={item.id}>
-                          <CardHeader className="p-0">
-                            <CardAction>
-                              <OptionDropdown
-                                key={item.id}
-                                open={
-                                  modalState.type === "option-task" &&
-                                  modalState.taskId === item.id
-                                }
-                                onOpenChange={() => {
-                                  if (
-                                    modalState.type === "option-task" &&
-                                    modalState.taskId === item.id
-                                  ) {
-                                    setModalState({
-                                      type: null,
-                                    });
-                                  } else {
-                                    setModalState({
-                                      type: "option-task",
-                                      taskId: item.id,
-                                    });
-                                  }
-                                }}
-                                onDelete={() => {
-                                  setModalState({
-                                    type: "delete-task",
-                                    taskId: item.id,
-                                  });
-                                }}
-                                onUpdate={() => {
-                                  setModalState({
-                                    type: "edit-task",
-                                    data: item,
-                                  });
-                                }}
-                                btnSize="xs"
-                              />
-                            </CardAction>
-                            <CardTitle>{item?.title}</CardTitle>
-                          </CardHeader>
-                          <CardDescription>
-                            {formatDueDate(item?.dueDate)}
-                          </CardDescription>
-                          {/* <CardFooter>
-                        <Button className="w-full">View Event</Button>
-                      </CardFooter> */}
-                        </Card>
-                      );
-                    })}
-                  <Card
-                    className="p-2 flex flex-row gap-2 align-middle cursor-pointer border-0"
-                    onClick={() => {
-                      setModalState({
-                        type: "add-task",
-                        status: status.id,
-                        boardId,
-                      });
-                    }}
-                  >
-                    <PlusIcon size={18} className="text-muted-foreground" />
-                    <CardDescription>Add New Task</CardDescription>
-                  </Card>
-                </Card>
-              );
-            })}
+            <DragDropProvider onDragEnd={handleDragEnd}>
+              {TASK_STATUS.map((status, index) => {
+                return (
+                  <TaskColumn
+                    status={status}
+                    setModalState={setModalState}
+                    modalState={modalState}
+                    key={status.id}
+                    tasks={visibleTasks}
+                    boardId={boardId}
+                  />
+                );
+              })}
+            </DragDropProvider>
           </div>
         </div>
         <div className="w-1/4">
