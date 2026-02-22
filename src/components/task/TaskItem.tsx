@@ -1,6 +1,5 @@
 import React from "react";
-import { Task, TaskStatus } from "@/types/task";
-import { useSortable } from "@dnd-kit/react/sortable";
+import { Task } from "@/types/task";
 import {
   Card,
   CardAction,
@@ -11,37 +10,44 @@ import {
 import { OptionDropdown } from "../ui/option-dropdown";
 import { formatDueDate } from "@/lib/utils";
 import { ModalState } from "@/types/state";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Props = {
   data: Task;
-  index: number;
   modalState: ModalState;
   setModalState: (data: ModalState) => void;
-  column: TaskStatus;
+  isOverlay?: boolean;
+  activeId?: string | null;
 };
 
 const TaskItem = ({
   data,
-  index,
   modalState,
   setModalState,
-  column,
+  isOverlay,
+  activeId,
 }: Props) => {
-  const { ref, isDragging } = useSortable({
-    id: data.id,
-    index,
-    type: "item",
-    accept: "item",
-    group: column,
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: data.id,
+    });
+
+  const style = !isOverlay
+    ? {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: activeId === data.id ? 0 : 1,
+      }
+    : undefined;
 
   return (
     <Card
       className="p-4 cursor-pointer"
-      key={data.id}
-      ref={ref}
-      // id={data.id}
-      data-dragging={isDragging}
+      ref={!isOverlay ? setNodeRef : undefined}
+      style={style}
+      {...(!isOverlay ? attributes : {})}
+      {...(!isOverlay ? listeners : {})}
     >
       <CardHeader className="p-0">
         <CardAction>
@@ -83,9 +89,6 @@ const TaskItem = ({
         <CardTitle>{data?.title}</CardTitle>
       </CardHeader>
       <CardDescription>{formatDueDate(data?.dueDate)}</CardDescription>
-      {/* <CardFooter>
-                        <Button className="w-full">View Event</Button>
-                      </CardFooter> */}
     </Card>
   );
 };

@@ -3,8 +3,11 @@ import { Task, TaskStatus } from "@/types/task";
 import { Card, CardDescription } from "../ui/card";
 import TaskItem from "./TaskItem";
 import { PlusIcon } from "lucide-react";
-import { CollisionPriority } from "@dnd-kit/abstract";
-import { useDroppable } from "@dnd-kit/react";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
 
 type Props = {
   status: {
@@ -15,6 +18,7 @@ type Props = {
   tasks: Task[];
   setModalState: (data: ModalState) => void;
   boardId: string;
+  activeId?: string | null;
 };
 
 const TaskColumn = ({
@@ -23,34 +27,34 @@ const TaskColumn = ({
   modalState,
   setModalState,
   boardId,
+  activeId,
 }: Props) => {
-  const { isDropTarget, ref } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: status.id,
-    type: "column",
-    collisionPriority: CollisionPriority.Low,
-    accept: "item",
   });
-
-  const style = isDropTarget ? { background: "#00000030" } : undefined;
+  const columnTasks = tasks
+    .filter((item) => item.status === status.id && boardId === item.boardId)
+    .sort((a, b) => a.order - b.order);
 
   return (
-    <Card id={status.id} className="p-4 gap-3" ref={ref} style={style}>
+    <Card ref={setNodeRef} id={status.id} className="p-4 gap-3">
       <p>{status.title}</p>
-      {tasks
-        .filter((item) => item.status === status.id && boardId === item.boardId)
-        .sort((a, b) => a.order - b.order)
-        .map((item, index) => {
+      <SortableContext
+        items={columnTasks.map((t) => t.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        {columnTasks.map((item) => {
           return (
             <TaskItem
               data={item}
-              index={index}
               modalState={modalState}
               setModalState={setModalState}
               key={item.id}
-              column={status.id}
+              activeId={activeId}
             />
           );
         })}
+      </SortableContext>
       <Card
         className="p-2 flex flex-row gap-2 align-middle cursor-pointer border-0"
         onClick={() => {
