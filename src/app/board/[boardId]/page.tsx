@@ -196,11 +196,11 @@ const Page = () => {
   };
 
   const commitTasks = (array: Task[]) => {
-    const record: Record<string, Task> = {};
-    array.forEach((t) => {
-      record[t.id] = t;
+    const newTasks: Record<string, Task> = {};
+    array.forEach((item) => {
+      newTasks[item.id] = item;
     });
-    updateTaskDragAndDrop(record);
+    updateTaskDragAndDrop(newTasks);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -208,45 +208,57 @@ const Page = () => {
   };
 
   const handleDragOver = (event: DragOverEvent) => {
-    console.log(event, "<<< dari handleDragOver");
     const { active, over } = event;
+
     if (!over) return;
 
     const activeId = active.id as string;
     const overId = over.id as string;
 
+    // current dragged task
     const activeTask = state.tasks[activeId];
     if (!activeTask) return;
 
+    // target drag task
     const overTask = state.tasks[overId];
 
     let newTasks = [...tasks];
 
-    const isColumn = TASK_STATUS.some((s) => s.id === overId);
+    // check is target is a status column
+    const isColumn = TASK_STATUS.some((status) => status.id === overId);
 
+    // target columns are empty (no task available)
+    // overId is Column Id (e.g: todo | inprogress | done)
     if (isColumn && activeTask.status !== overId) {
-      newTasks = newTasks.map((t) =>
-        t.id === activeId ? { ...t, status: overId as TaskStatus } : t,
+      // change the status of the selected task
+      newTasks = newTasks.map((item) =>
+        item.id === activeId ? { ...item, status: overId as TaskStatus } : item,
       );
     }
 
+    // target columns already have an items
+    // overId is Task Id (tasks[id])
     if (overTask && activeTask.status !== overTask.status) {
-      newTasks = newTasks.map((t) =>
-        t.id === activeId ? { ...t, status: overTask.status } : t,
+      // change the status of the selectedTask by target status
+      newTasks = newTasks.map((item) =>
+        item.id === activeId ? { ...item, status: overTask.status } : item,
       );
     }
 
+    // if drag to task, use target status, if drag to column but empty, use overId
     const targetStatus = overTask?.status ?? (isColumn ? overId : null);
 
     if (targetStatus) {
+      // Reindex order
       const columnTasks = newTasks
         .filter(
-          (t) => t.status === targetStatus && t.boardId === activeTask.boardId,
+          (item) =>
+            item.status === targetStatus && item.boardId === activeTask.boardId,
         )
         .sort((a, b) => a.order - b.order);
 
       columnTasks.forEach((task, index) => {
-        const i = newTasks.findIndex((t) => t.id === task.id);
+        const i = newTasks.findIndex((item) => item.id === task.id);
         newTasks[i] = { ...task, order: index };
       });
 
@@ -272,11 +284,13 @@ const Page = () => {
 
     const newTasks = [...tasks];
 
+    // if dragged task dropped on the same column
     if (overTask && activeTask.status === overTask.status) {
+      // get all task in those columns
       const columnTasks = getColumnTasks(activeTask.status);
 
-      const oldIndex = columnTasks.findIndex((t) => t.id === activeId);
-      const newIndex = columnTasks.findIndex((t) => t.id === overId);
+      const oldIndex = columnTasks.findIndex((item) => item.id === activeId);
+      const newIndex = columnTasks.findIndex((item) => item.id === overId);
 
       const reordered = arrayMove(columnTasks, oldIndex, newIndex);
 
