@@ -30,9 +30,19 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { DragDropProvider, useDroppable } from "@dnd-kit/react";
 import TaskColumn from "@/components/task/TaskColumn";
 import { ModalState } from "@/types/state";
+import { useAppState } from "@/hooks/useAppState";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragOverlay,
+  DragStartEvent,
+  closestCorners,
+} from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
+import TaskItem from "@/components/task/TaskItem";
 
 const TASK_STATUS: {
   title: string;
@@ -59,6 +69,7 @@ const Page = () => {
   const boardId = params.boardId;
   const { tasks, deleteTask, updateTaskDragAndDrop } = useTasks();
   const { boards, deleteBoard } = useBoards();
+  const { state } = useAppState();
 
   const [modalState, setModalState] = useState<ModalState>({
     type: null,
@@ -66,6 +77,7 @@ const Page = () => {
   const [mounted, setMounted] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -177,96 +189,105 @@ const Page = () => {
     return <div>Loading</div>;
   }
 
-  function recalculateOrder(tasks: Task[]) {
-    // Reset ulang order berdasarkan posisi array saat ini
-    return tasks.map((task, index) => ({
-      ...task,
-      order: index + 1, // order dimulai dari 1
-    }));
-  }
-
-  const handleDragEnd = (event) => {
-    const { source, target } = event.operation;
-    // Kalau drop di luar droppable area → abaikan
-    if (!target) return;
-
-    const sourceId = source.id;
-    const targetId = target.id;
-
-    // Kalau drop ke dirinya sendiri → tidak perlu apa-apa
-    if (sourceId === targetId) return;
-
-    // Ambil task langsung dari record (lookup O(1))
-    const sourceTask = tasks.find((item) => item.id === sourceId);
-    const targetTask = tasks.find((item) => item.id === targetId);
-
-    // Safety check
-    if (!sourceTask || !targetTask) return;
-
-    const sourceColumn = sourceTask.status;
-    const targetColumn = targetTask.status;
-    const boardId = sourceTask.boardId;
-
-    // Ambil semua task di column asal dalam board yang sama
-    const sourceColumnTasks = tasks
-      .filter((t) => t.boardId === boardId && t.status === sourceColumn)
+  const getColumnTasks = (status: string) => {
+    return tasks
+      .filter((t) => t.status === status && t.boardId === boardId)
       .sort((a, b) => a.order - b.order);
+  };
 
-    // Kalau beda column, ambil juga column target
-    const targetColumnTasks =
-      sourceColumn === targetColumn
-        ? sourceColumnTasks
-        : tasks
-            .filter((t) => t.boardId === boardId && t.status === targetColumn)
-            .sort((a, b) => a.order - b.order);
+  const commitTasks = (array: Task[]) => {
+    const record: Record<string, Task> = {};
+    array.forEach((t) => {
+      record[t.id] = t;
+    });
+    updateTaskDragAndDrop(record);
+  };
 
-    console.log({ sourceColumnTasks, targetColumnTasks });
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
 
-    // Cari posisi lama dan posisi target
-    const sourceIndex = sourceColumnTasks.findIndex((t) => t.id === sourceId);
+  const handleDragOver = (event: DragOverEvent) => {
+    console.log(event, "<<< dari handleDragOver");
+    const { active, over } = event;
+    if (!over) return;
 
-    const targetIndex = targetColumnTasks.findIndex((t) => t.id === targetId);
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-    // ===============================
-    // CASE 1: Reorder dalam column yang sama
-    // ===============================
-    if (sourceColumn === targetColumn) {
-      // Hapus task dari posisi lama
-      const [moved] = sourceColumnTasks.splice(sourceIndex, 1);
+    const activeTask = state.tasks[activeId];
+    if (!activeTask) return;
 
-      // Masukkan ke posisi baru
-      sourceColumnTasks.splice(targetIndex, 0, moved);
+    const overTask = state.tasks[overId];
 
-      // Reset ulang order supaya konsisten
-      const updatedColumn = recalculateOrder(sourceColumnTasks);
-      console.log({ updatedColumn }, "<< same col");
+    let newTasks = [...tasks];
 
-      updateTaskDragAndDrop(updatedColumn);
+    const isColumn = TASK_STATUS.some((s) => s.id === overId);
 
+    if (isColumn && activeTask.status !== overId) {
+      newTasks = newTasks.map((t) =>
+        t.id === activeId ? { ...t, status: overId as TaskStatus } : t,
+      );
+    }
+
+    if (overTask && activeTask.status !== overTask.status) {
+      newTasks = newTasks.map((t) =>
+        t.id === activeId ? { ...t, status: overTask.status } : t,
+      );
+    }
+
+    const targetStatus = overTask?.status ?? (isColumn ? overId : null);
+
+    if (targetStatus) {
+      const columnTasks = newTasks
+        .filter(
+          (t) => t.status === targetStatus && t.boardId === activeTask.boardId,
+        )
+        .sort((a, b) => a.order - b.order);
+
+      columnTasks.forEach((task, index) => {
+        const i = newTasks.findIndex((t) => t.id === task.id);
+        newTasks[i] = { ...task, order: index };
+      });
+
+      commitTasks(newTasks);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) {
+      setActiveId(null);
       return;
     }
 
-    // ===============================
-    // CASE 2: Pindah ke column berbeda
-    // ===============================
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-    // Hapus dari column lama
-    const [moved] = sourceColumnTasks.splice(sourceIndex, 1);
+    const activeTask = state.tasks[activeId];
+    const overTask = state.tasks[overId];
 
-    // Update status task
-    const updatedMoved = {
-      ...moved,
-      status: targetColumn,
-    };
+    if (!activeTask) return;
 
-    // Masukkan ke column baru
-    targetColumnTasks.splice(targetIndex, 0, updatedMoved);
+    const newTasks = [...tasks];
 
-    // Reset ulang order di kedua column
-    const updatedSource = recalculateOrder(sourceColumnTasks);
-    const updatedTarget = recalculateOrder(targetColumnTasks);
+    if (overTask && activeTask.status === overTask.status) {
+      const columnTasks = getColumnTasks(activeTask.status);
 
-    updateTaskDragAndDrop([...updatedSource, ...updatedTarget]);
+      const oldIndex = columnTasks.findIndex((t) => t.id === activeId);
+      const newIndex = columnTasks.findIndex((t) => t.id === overId);
+
+      const reordered = arrayMove(columnTasks, oldIndex, newIndex);
+
+      reordered.forEach((task, index) => {
+        const i = newTasks.findIndex((t) => t.id === task.id);
+        newTasks[i] = { ...task, order: index };
+      });
+    }
+
+    commitTasks(newTasks);
+    setActiveId(null);
   };
 
   return (
@@ -357,22 +378,42 @@ const Page = () => {
             <Button onClick={() => setFilter("today")}>Today</Button>
             <Button onClick={() => setFilter("overdue")}>Overdue</Button>
           </div>
-          <div className="grid grid-cols-[30%_30%_30%_1fr] gap-4 items-start">
-            <DragDropProvider onDragEnd={handleDragEnd}>
-              {TASK_STATUS.map((status, index) => {
+          <DndContext
+            collisionDetection={closestCorners}
+            onDragCancel={() => {
+              setActiveId(null);
+            }}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="grid grid-cols-[30%_30%_30%_1fr] gap-4 items-start">
+              {TASK_STATUS.map((status) => {
                 return (
                   <TaskColumn
+                    key={status.id}
                     status={status}
+                    tasks={visibleTasks}
                     setModalState={setModalState}
                     modalState={modalState}
-                    key={status.id}
-                    tasks={visibleTasks}
                     boardId={boardId}
+                    activeId={activeId}
                   />
                 );
               })}
-            </DragDropProvider>
-          </div>
+              <DragOverlay>
+                {activeId ? (
+                  <TaskItem
+                    data={state.tasks[activeId]}
+                    isOverlay
+                    modalState={modalState}
+                    setModalState={setModalState}
+                    activeId={null}
+                  />
+                ) : null}
+              </DragOverlay>
+            </div>
+          </DndContext>
         </div>
         <div className="w-1/4">
           <div className="w-full bg-blue-300">
