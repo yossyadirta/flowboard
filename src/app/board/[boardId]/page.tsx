@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/input-group";
 import TaskColumn from "@/components/task/TaskColumn";
 import { ModalState } from "@/types/state";
-import { useAppState } from "@/hooks/useAppState";
 import {
   DndContext,
   DragEndEvent,
@@ -67,9 +66,8 @@ const Page = () => {
   const router = useRouter();
 
   const boardId = params.boardId;
-  const { tasks, deleteTask, updateTaskDragAndDrop } = useTasks();
+  const { tasks, mappedTasks, deleteTask, updateTaskDragAndDrop } = useTasks();
   const { boards, deleteBoard } = useBoards();
-  const { state } = useAppState();
 
   const [modalState, setModalState] = useState<ModalState>({
     type: null,
@@ -127,17 +125,19 @@ const Page = () => {
   }, [boardId, boards]);
 
   const totalTask =
-    tasks.filter((item) => item.boardId === boardId).length || 0;
+    mappedTasks.filter((item) => item.boardId === boardId).length || 0;
   const totalTodoTask =
-    tasks.filter((item) => item.boardId === boardId && item.status === "todo")
-      .length || 0;
+    mappedTasks.filter(
+      (item) => item.boardId === boardId && item.status === "todo",
+    ).length || 0;
   const totalInprogressTask =
-    tasks.filter(
+    mappedTasks.filter(
       (item) => item.boardId === boardId && item.status === "in-progress",
     ).length || 0;
   const totalDoneTask =
-    tasks.filter((item) => item.boardId === boardId && item.status === "done")
-      .length || 0;
+    mappedTasks.filter(
+      (item) => item.boardId === boardId && item.status === "done",
+    ).length || 0;
   const taskProgress =
     totalTask === 0 ? 0 : Math.round((totalDoneTask / totalTask) * 100);
 
@@ -169,7 +169,7 @@ const Page = () => {
   };
 
   const visibleTasks = useMemo(() => {
-    return tasks
+    return mappedTasks
       .filter((item) => boardId === item.boardId)
       .filter((task) => {
         if (filter === "today") return isToday(task.dueDate);
@@ -179,7 +179,7 @@ const Page = () => {
       .filter((task) =>
         task.title.toLowerCase().includes(search.toLowerCase()),
       );
-  }, [filter, search, tasks, boardId]);
+  }, [filter, search, mappedTasks, boardId]);
 
   useEffect(() => {
     handleUpdateMounted();
@@ -190,7 +190,7 @@ const Page = () => {
   }
 
   const getColumnTasks = (status: string) => {
-    return tasks
+    return mappedTasks
       .filter((t) => t.status === status && t.boardId === boardId)
       .sort((a, b) => a.order - b.order);
   };
@@ -216,13 +216,13 @@ const Page = () => {
     const overId = over.id as string;
 
     // current dragged task
-    const activeTask = state.tasks[activeId];
+    const activeTask = tasks[activeId];
     if (!activeTask) return;
 
     // target drag task
-    const overTask = state.tasks[overId];
+    const overTask = tasks[overId];
 
-    let newTasks = [...tasks];
+    let newTasks = [...mappedTasks];
 
     // check is target is a status column
     const isColumn = TASK_STATUS.some((status) => status.id === overId);
@@ -277,12 +277,12 @@ const Page = () => {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    const activeTask = state.tasks[activeId];
-    const overTask = state.tasks[overId];
+    const activeTask = tasks[activeId];
+    const overTask = tasks[overId];
 
     if (!activeTask) return;
 
-    const newTasks = [...tasks];
+    const newTasks = [...mappedTasks];
 
     // if dragged task dropped on the same column
     if (overTask && activeTask.status === overTask.status) {
@@ -418,7 +418,7 @@ const Page = () => {
               <DragOverlay>
                 {activeId ? (
                   <TaskItem
-                    data={state.tasks[activeId]}
+                    data={tasks[activeId]}
                     isOverlay
                     modalState={modalState}
                     setModalState={setModalState}

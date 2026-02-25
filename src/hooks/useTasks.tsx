@@ -13,7 +13,8 @@ import {
 export const useTasks = () => {
   const { state, dispatch } = useAppState();
 
-  const tasks = Object.values(state.tasks);
+  const tasks = state.tasks;
+  const mappedTasks = Object.values(tasks);
 
   const addTask = (
     boardId: string,
@@ -21,7 +22,7 @@ export const useTasks = () => {
     status: TaskStatus,
     dueDate: Date,
   ) => {
-    const sameColumnTasks = tasks.filter(
+    const sameColumnTasks = mappedTasks.filter(
       (task) => task.boardId === boardId && task.status === status,
     );
     const maxOrder =
@@ -76,6 +77,7 @@ export const useTasks = () => {
 
   return {
     tasks,
+    mappedTasks,
     addTask,
     updateTaskContent,
     updateTaskDragAndDrop,
