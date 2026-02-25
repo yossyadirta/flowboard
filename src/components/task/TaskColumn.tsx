@@ -11,8 +11,8 @@ import { useDroppable } from "@dnd-kit/core";
 
 type Props = {
   status: {
-    title: string;
-    id: TaskStatus;
+    label: string;
+    value: TaskStatus;
   };
   modalState: ModalState;
   tasks: Task[];
@@ -30,15 +30,15 @@ const TaskColumn = ({
   activeId,
 }: Props) => {
   const { setNodeRef } = useDroppable({
-    id: status.id,
+    id: status.value,
   });
   const columnTasks = tasks
-    .filter((item) => item.status === status.id && boardId === item.boardId)
+    .filter((item) => item.status === status.value && boardId === item.boardId)
     .sort((a, b) => a.order - b.order);
 
   return (
-    <Card ref={setNodeRef} id={status.id} className="p-4 gap-3">
-      <p>{status.title}</p>
+    <Card ref={setNodeRef} id={status.value} className="p-4 gap-3">
+      <p>{status.label}</p>
       <SortableContext
         items={columnTasks.map((t) => t.id)}
         strategy={verticalListSortingStrategy}
@@ -60,7 +60,7 @@ const TaskColumn = ({
         onClick={() => {
           setModalState({
             type: "add-task",
-            status: status.id,
+            status: status.value,
             boardId,
           });
         }}
