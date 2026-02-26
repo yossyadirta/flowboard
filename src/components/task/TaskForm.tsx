@@ -52,7 +52,9 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
     defaultValues: {
       title: defaultValues?.title ?? "",
       status: defaultValues?.status ?? undefined,
-      dueDate: defaultValues?.dueDate ?? new Date(),
+      dueDate: defaultValues?.dueDate
+        ? new Date(defaultValues.dueDate)
+        : new Date(),
     },
   });
 
