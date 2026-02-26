@@ -26,24 +26,26 @@ export function OptionDropdown({
   btnSize,
 }: Props) {
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size={btnSize}>
-          <Ellipsis />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40" align="end">
-        <DropdownMenuItem onClick={onUpdate}>
-          <PencilIcon />
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuGroup>
-          <DropdownMenuItem variant="destructive" onClick={onDelete}>
-            <TrashIcon />
-            Delete
+    <div onPointerDown={(e) => e.stopPropagation()}>
+      <DropdownMenu open={open} onOpenChange={onOpenChange}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size={btnSize}>
+            <Ellipsis />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40" align="end">
+          <DropdownMenuItem onClick={onUpdate}>
+            <PencilIcon />
+            Edit
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuGroup>
+            <DropdownMenuItem variant="destructive" onClick={onDelete}>
+              <TrashIcon />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
