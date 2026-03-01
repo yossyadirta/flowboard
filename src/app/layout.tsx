@@ -4,7 +4,7 @@ import { Providers } from "@/providers";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "Flow Board",
+  title: "Flowboard",
   description: "Productivity Web App",
 };
 
