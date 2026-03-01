@@ -5,6 +5,7 @@ import { useBoards } from "@/hooks/useBoards";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { AddBoardModal } from "../board/AddBoardModal";
+import Image from "next/image";
 
 const Sidebar = () => {
   const { boards } = useBoards();
@@ -15,7 +16,10 @@ const Sidebar = () => {
   return (
     <>
       <div className="flex justify-between flex-col p-4 gap-4 h-full">
-        <div>Flow Board</div>
+        <div className="flex items-center gap-0.5">
+          <Image src="/logo.svg" alt="Flow Board Logo" width={40} height={40} />
+          <h1 className="scroll-m-20 text-3xl font-bold">Flowboard</h1>
+        </div>
         <div className="flex-1 overflow-auto p-2">
           <ul>
             {boards.map((item) => {
