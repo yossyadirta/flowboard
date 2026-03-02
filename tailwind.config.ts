@@ -8,7 +8,11 @@ const config: Config = {
     "./hooks/**/*.{ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-jakarta)"],
+      },
+    },
   },
   plugins: [],
 };
