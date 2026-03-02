@@ -3,6 +3,7 @@
 import React from "react";
 import { ThemeProvider } from "./ThemeProvider";
 import { AppProvider } from "./AppProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
       </ThemeProvider>
     </AppProvider>
   );
