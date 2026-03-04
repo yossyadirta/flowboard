@@ -28,6 +28,11 @@ const BoardModals = ({
   dnd,
   derived,
 }: Props) => {
+  const stateTypeValue = modalState.type ? modalState.type.split("-")[1] : "";
+
+  const stateType =
+    stateTypeValue.charAt(0).toUpperCase() + stateTypeValue.slice(1);
+
   return (
     <>
       <ConfirmDialog
@@ -36,8 +41,8 @@ const BoardModals = ({
           modalState.type === "delete-task"
         }
         onClose={closeModal}
-        title={`Delete ${modalState.type}?`}
-        description={`This will permanently delete this ${modalState.type}. Are you sure want to delete?`}
+        title={`Delete ${stateType}?`}
+        description={`This will permanently delete this ${stateTypeValue}. Are you sure want to delete?`}
         onDelete={() => {
           if (modalState.type === "delete-board") {
             return actions.handleDeleteBoard();
