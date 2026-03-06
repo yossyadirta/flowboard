@@ -52,7 +52,7 @@ export default function DashboardLayout({
           <SidebarHeader className="flex justify-between py-4 px-5">
             <div className="flex items-center gap-0.5">
               <Image src="/logo.svg" alt="Flow Board" width={32} height={32} />
-              <span className="font-bold text-xl">Flowboard</span>
+              <span className="font-bold text-2xl">Flowboard</span>
             </div>
           </SidebarHeader>
 
