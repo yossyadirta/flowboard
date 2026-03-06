@@ -6,7 +6,6 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import Image from "next/image";
 import { AddBoardModal } from "@/components/board/AddBoardModal";
-
 import {
   SidebarProvider,
   Sidebar,
@@ -23,6 +22,8 @@ import {
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BOARD_ICONS_MAP } from "@/components/board/BoardIcons";
+import { Moon, Sun } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function DashboardLayout({
   children,
@@ -30,8 +31,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
   const { boards } = useBoards();
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
   const [isMounted, setIsMounted] = useState(false);
   const [isOpenAddBoardModal, setIsOpenAddBoardModal] = useState(false);
 
@@ -103,10 +106,37 @@ export default function DashboardLayout({
           </SidebarContent>
 
           <SidebarFooter>
-            <div className="flex justify-between px-4 py-3">
-              <button onClick={() => setTheme("light")}>Light</button>
-              <button onClick={() => setTheme("dark")}>Dark</button>
-            </div>
+            <ToggleGroup
+              type="single"
+              value={theme}
+              onValueChange={(value) => value && setTheme(value)}
+              className="bg-muted rounded-lg w-full flex p-1.5"
+              spacing={1}
+            >
+              <ToggleGroupItem
+                value="light"
+                className="
+                  flex-1 rounded-lg
+                  data-[state=on]:bg-background
+                  data-[state=on]:text-foreground
+                "
+              >
+                <Sun className="h-4 w-4 mr-1" />
+                Light
+              </ToggleGroupItem>
+
+              <ToggleGroupItem
+                value="dark"
+                className="
+                  flex-1 rounded-lg
+                  data-[state=on]:bg-background
+                  data-[state=on]:text-foreground
+                "
+              >
+                <Moon className="h-4 w-4 mr-1" />
+                Dark
+              </ToggleGroupItem>
+            </ToggleGroup>
           </SidebarFooter>
         </Sidebar>
 
@@ -119,7 +149,7 @@ export default function DashboardLayout({
 
             <SidebarTrigger />
           </header>
-          <main className="min-h-screen bg-secondary m-4 rounded-lg p-6">
+          <main className="min-h-screen bg-secondary m-4 rounded-lg p-6 ml-1">
             {children}
           </main>
         </SidebarInset>
