@@ -105,7 +105,7 @@ export default function DashboardLayout({
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter>
+          <SidebarFooter className="pb-4">
             <ToggleGroup
               type="single"
               value={theme}
@@ -140,7 +140,7 @@ export default function DashboardLayout({
           </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset>
+        <SidebarInset className="flex flex-col min-h-screen">
           <header className="md:hidden sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-background border-b border-border">
             <div className="flex items-center gap-0.5">
               <Image src="/logo.svg" alt="Flow Board" width={32} height={32} />
@@ -149,7 +149,7 @@ export default function DashboardLayout({
 
             <SidebarTrigger />
           </header>
-          <main className="min-h-screen bg-secondary m-4 rounded-lg p-6 ml-1">
+          <main className="flex-1 bg-secondary m-4 rounded-lg p-6 ml-1">
             {children}
           </main>
         </SidebarInset>
