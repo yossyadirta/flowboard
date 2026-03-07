@@ -52,7 +52,7 @@ export default function DashboardLayout({
         <Sidebar collapsible="offcanvas">
           <SidebarHeader className="flex justify-between py-4 px-5">
             <div className="flex items-center gap-0.5">
-              <Image src="/logo.svg" alt="Flow Board" width={32} height={32} />
+              <Image src="/logo.svg" alt="Flowboard" width={32} height={32} />
               <span className="font-bold text-2xl">Flowboard</span>
             </div>
           </SidebarHeader>
@@ -96,6 +96,7 @@ export default function DashboardLayout({
                   flex-1 rounded-lg
                   data-[state=on]:bg-background
                   data-[state=on]:text-foreground
+                  cursor-pointer
                 "
               >
                 <Sun className="h-4 w-4 mr-1" />
@@ -108,6 +109,7 @@ export default function DashboardLayout({
                   flex-1 rounded-lg
                   data-[state=on]:bg-background
                   data-[state=on]:text-foreground
+                  cursor-pointer
                 "
               >
                 <Moon className="h-4 w-4 mr-1" />
