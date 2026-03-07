@@ -3,7 +3,6 @@
 import React, { useEffect, useEffectEvent, useState } from "react";
 import { useBoards } from "@/hooks/useBoards";
 import { useTheme } from "next-themes";
-import Link from "next/link";
 import Image from "next/image";
 import { AddBoardModal } from "@/components/board/AddBoardModal";
 import {
@@ -20,10 +19,9 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { BOARD_ICONS_MAP } from "@/components/board/BoardIcons";
 import { Moon, Sun } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import BoardMenuItem from "./[boardId]/components/BoardMenuItem";
 
 export default function DashboardLayout({
   children,
@@ -62,34 +60,13 @@ export default function DashboardLayout({
           <SidebarContent>
             <SidebarGroup>
               <SidebarMenu>
-                {boards.map((item) => {
-                  console.log(item);
-                  const href = `/board/${item.id}`;
-                  const isActive = pathname === href;
-                  const { emoji } = BOARD_ICONS_MAP[item?.icon ?? "briefcase"];
-
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton isActive={isActive}>
-                        <Avatar className="w-4 transition-colors">
-                          <AvatarFallback className="bg-transparent">
-                            {emoji}
-                          </AvatarFallback>
-                        </Avatar>
-                        <Link
-                          href={href}
-                          className={`${
-                            isActive
-                              ? "text-foreground"
-                              : "text-muted-foreground"
-                          } font-semibold`}
-                        >
-                          {item.name}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
+                {boards.map((item) => (
+                  <BoardMenuItem
+                    key={item.id}
+                    item={item}
+                    pathname={pathname}
+                  />
+                ))}
 
                 <SidebarMenuItem>
                   <SidebarMenuButton
