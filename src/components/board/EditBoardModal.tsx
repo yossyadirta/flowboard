@@ -31,14 +31,16 @@ export function EditBoardModal({ open, onClose, data }: Props) {
 
   const handleSubmit = ({
     name,
+    description,
     icon,
   }: {
     name: string;
+    description: string;
     icon: BoardIconId;
   }) => {
     if (!data?.id) return;
 
-    const board: Board = { ...data, name, icon };
+    const board: Board = { ...data, name, icon, description };
     updateBoard(board);
     onClose();
     toast.success("Board has been updated", {
@@ -59,6 +61,7 @@ export function EditBoardModal({ open, onClose, data }: Props) {
           onValidityChange={setCanSubmit}
           defaultValues={{
             name: data?.name ?? "",
+            description: data?.description ?? "",
             icon: data?.icon ?? "briefcase",
           }}
         />

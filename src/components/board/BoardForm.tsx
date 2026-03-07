@@ -1,13 +1,27 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BoardFormValues, boardSchema } from "@/schemas/board.schemas";
-import { Field, FieldGroup } from "@/components/ui/field";
+
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
+
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { BOARD_ICONS_MAP, BoardIconId } from "./BoardIcons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+import { BOARD_ICONS_MAP, BoardIconId } from "./BoardIcons";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 
@@ -26,7 +40,6 @@ export function BoardForm({
 }: Props) {
   const {
     handleSubmit,
-    register,
     control,
     setValue,
     formState: { isValid, isDirty },
@@ -35,6 +48,7 @@ export function BoardForm({
     mode: "onChange",
     defaultValues: {
       name: defaultValues?.name ?? "",
+      description: defaultValues?.description ?? "",
       icon: defaultValues?.icon ?? "briefcase",
     },
   });
@@ -44,7 +58,7 @@ export function BoardForm({
   }, [onValidityChange, isDirty, isValid]);
 
   const selectedIcon = useWatch({
-    control: control,
+    control,
     name: "icon",
   });
 
@@ -52,24 +66,64 @@ export function BoardForm({
     <form
       id="board-form"
       onSubmit={handleSubmit(onSubmit)}
-      className="flex gap-4 flex-col"
+      className="flex flex-col gap-4"
     >
       <FieldGroup>
+        {/* NAME */}
+        <Controller
+          name="name"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="board-name">Name</FieldLabel>
+
+              <Input
+                {...field}
+                id="board-name"
+                placeholder="e.g. Default Board"
+                aria-invalid={fieldState.invalid}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="description"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="board-description">Description</FieldLabel>
+
+              <InputGroup>
+                <InputGroupTextarea
+                  {...field}
+                  id="board-description"
+                  rows={4}
+                  className="min-h-24 resize-none"
+                  placeholder="Short description for this board"
+                  aria-invalid={fieldState.invalid}
+                />
+
+                <InputGroupAddon align="block-end">
+                  <InputGroupText className="tabular-nums">
+                    {field.value?.length ?? 0}/200
+                  </InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* ICON */}
         <Field>
-          <Label htmlFor="board-name">Name</Label>
-          <Input
-            id="board-name"
-            {...register("name")}
-            placeholder="e.g. Default Board"
-          />
-        </Field>
-      </FieldGroup>
-      <FieldGroup>
-        <Field>
-          <Label>Icon</Label>
-          <div className="flex gap-2 flex-wrap">
+          <FieldLabel>Icon</FieldLabel>
+
+          <div className="flex flex-wrap gap-2">
             {icons.map((iconId) => {
-              const { emoji, bg } = BOARD_ICONS_MAP[iconId];
+              const { emoji } = BOARD_ICONS_MAP[iconId];
               const selected = selectedIcon === iconId;
 
               return (
@@ -87,12 +141,11 @@ export function BoardForm({
                 >
                   <Avatar
                     className={cn(
-                      "h-10 w-10 flex items-center justify-center border transition-colors  ",
+                      "h-10 w-10 border transition-colors flex items-center justify-center",
                       selected
                         ? "border-primary"
                         : "border-transparent hover:border-muted-foreground/40",
                     )}
-                    style={{ backgroundColor: bg }}
                   >
                     <AvatarFallback className="bg-transparent text-lg">
                       {emoji}
