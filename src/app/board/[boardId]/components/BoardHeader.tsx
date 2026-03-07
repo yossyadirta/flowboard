@@ -4,6 +4,7 @@ import { Board } from "@/types/board";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { ModalState } from "@/types/state";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 type Props = {
   derived: {
@@ -25,17 +26,20 @@ const BoardHeader = ({
   boardId,
 }: Props) => {
   return (
-    <>
+    <div className="pb-4">
       <div className="flex justify-between align-top">
-        <div className="flex flex-col gap-2">
-          <Avatar className="h-21 w-21 flex items-center justify-center transition-colors">
-            <AvatarFallback className="bg-transparent text-3xl">
+        <div className="flex flex-col gap-3">
+          <Avatar className="h-16 w-16 flex items-center justify-center transition-colors">
+            <AvatarFallback className="bg-transparent text-5xl">
               {derived.emoji}
             </AvatarFallback>
           </Avatar>
-          <h3 className="scroll-m-20 text-center text-3xl font-extrabold tracking-tight text-balance">
+          <h3 className="scroll-m-20 text-3xl font-bold tracking-tight text-balance">
             {derived.currentBoard?.name ?? ""}
           </h3>
+          <p className="scroll-m-20 text-md font-medium tracking-tight text-muted-foreground">
+            {derived.currentBoard?.description ?? ""}
+          </p>
         </div>
         <div>
           <OptionDropdown
@@ -59,11 +63,14 @@ const BoardHeader = ({
                 type: "edit-board",
               });
             }}
+            btnClassName="bg-transparent border-0"
           />
         </div>
       </div>
       <br />
       <Button
+        variant="outline"
+        className="bg-secondary border-2"
         onClick={() => {
           setModalState({
             type: "add-task",
@@ -72,9 +79,10 @@ const BoardHeader = ({
           });
         }}
       >
+        <Plus className="text-white" />
         Add New Task
       </Button>
-    </>
+    </div>
   );
 };
 
