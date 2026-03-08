@@ -16,6 +16,7 @@ type Props = {
   onDelete: () => void;
   onUpdate: () => void;
   btnSize?: "default" | "sm" | "xs";
+  btnClassName?: string;
 };
 
 export function OptionDropdown({
@@ -24,17 +25,21 @@ export function OptionDropdown({
   onDelete,
   onUpdate,
   btnSize,
+  btnClassName,
 }: Props) {
   return (
     <div onPointerDown={(e) => e.stopPropagation()}>
       <DropdownMenu open={open} onOpenChange={onOpenChange}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size={btnSize}>
+          <Button variant="outline" size={btnSize} className={btnClassName}>
             <Ellipsis />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40" align="end">
-          <DropdownMenuItem onClick={onUpdate}>
+          <DropdownMenuItem
+            className="hover:bg-sidebar-accent! hover:text-sidebar-accent-foreground!"
+            onClick={onUpdate}
+          >
             <PencilIcon />
             Edit
           </DropdownMenuItem>
