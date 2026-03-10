@@ -11,13 +11,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group";
-
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -48,7 +41,6 @@ export function BoardForm({
     mode: "onChange",
     defaultValues: {
       name: defaultValues?.name ?? "",
-      description: defaultValues?.description ?? "",
       icon: defaultValues?.icon ?? "briefcase",
     },
   });
@@ -84,34 +76,6 @@ export function BoardForm({
                 aria-invalid={fieldState.invalid}
               />
 
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="description"
-          control={control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="board-description">Description</FieldLabel>
-
-              <InputGroup>
-                <InputGroupTextarea
-                  {...field}
-                  id="board-description"
-                  rows={4}
-                  className="min-h-24 resize-none"
-                  placeholder="Short description for this board"
-                  aria-invalid={fieldState.invalid}
-                />
-
-                <InputGroupAddon align="block-end">
-                  <InputGroupText className="tabular-nums">
-                    {field.value?.length ?? 0}/200
-                  </InputGroupText>
-                </InputGroupAddon>
-              </InputGroup>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

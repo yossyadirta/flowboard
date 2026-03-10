@@ -31,15 +31,13 @@ export function AddBoardModal({ open, onClose }: Props) {
 
   const handleSubmit = ({
     name,
-    description,
     icon,
   }: {
     name: string;
-    description: string;
     icon: BoardIconId;
   }) => {
     const id = generateId();
-    addBoard({ id, name, icon, description });
+    addBoard({ id, name, icon });
     onClose();
     router.push(`/board/${id}`);
   };

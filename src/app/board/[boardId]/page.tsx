@@ -47,7 +47,6 @@ const Page = () => {
         derived={derived}
         mounted={mounted}
         modalState={modalState}
-        boardId={boardId}
         setModalState={setModalState}
         closeModal={closeModal}
       />

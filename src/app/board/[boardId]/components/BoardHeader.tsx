@@ -3,8 +3,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Board } from "@/types/board";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { ModalState } from "@/types/state";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 
 type Props = {
   derived: {
@@ -15,7 +13,6 @@ type Props = {
   modalState: ModalState;
   setModalState: (data: ModalState) => void;
   closeModal: () => void;
-  boardId: string;
 };
 
 const BoardHeader = ({
@@ -23,7 +20,6 @@ const BoardHeader = ({
   setModalState,
   modalState,
   closeModal,
-  boardId,
 }: Props) => {
   return (
     <div className="pb-4">
@@ -37,9 +33,6 @@ const BoardHeader = ({
           <h3 className="scroll-m-20 text-3xl font-bold tracking-tight text-balance">
             {derived.currentBoard?.name ?? ""}
           </h3>
-          <p className="scroll-m-20 text-md font-medium tracking-tight text-muted-foreground">
-            {derived.currentBoard?.description ?? ""}
-          </p>
         </div>
         <div>
           <OptionDropdown
@@ -67,21 +60,6 @@ const BoardHeader = ({
           />
         </div>
       </div>
-      <br />
-      <Button
-        variant="outline"
-        className="bg-secondary border-2"
-        onClick={() => {
-          setModalState({
-            type: "add-task",
-            status: undefined,
-            boardId,
-          });
-        }}
-      >
-        <Plus className="text-white" />
-        Add New Task
-      </Button>
     </div>
   );
 };
