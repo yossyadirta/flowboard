@@ -57,10 +57,8 @@ const BoardColumns = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="w-3/4 flex gap-8 flex-col">
-      <div className="w-full bg-blue-300">
-        <h4>Tasks</h4>
-      </div>
+    <div className="w-3/4 flex flex-col gap-4">
+      <h3 className="font-bold text-2xl tracking-tight text-balance">Tasks</h3>
       <div>
         <InputGroup>
           <InputGroupInput

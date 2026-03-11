@@ -15,10 +15,10 @@ type Props = {
 
 const BoardCompletion = ({ derived }: Props) => {
   return (
-    <div className="w-1/4">
-      <div className="w-full bg-blue-300">
-        <h4>Completion</h4>
-      </div>
+    <div className="w-1/4 flex flex-col gap-4">
+      <h3 className="font-bold text-2xl tracking-tight text-balance">
+        Completion
+      </h3>
       <Card>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
