@@ -9,18 +9,14 @@ import {
   SidebarProvider,
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarHeader,
   SidebarInset,
-  SidebarTrigger,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { Moon, Sun } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Clipboard, SunMoon } from "lucide-react";
 import BoardMenuItem from "./[boardId]/components/BoardMenuItem";
 
 export default function DashboardLayout({
@@ -49,88 +45,63 @@ export default function DashboardLayout({
   return (
     <>
       <SidebarProvider>
-        <Sidebar collapsible="offcanvas">
-          <SidebarHeader className="flex justify-between py-4 px-5">
-            <div className="flex items-center gap-0.5">
-              <Image src="/logo.svg" alt="Flowboard" width={32} height={32} />
-              <span className="font-bold text-2xl">Flowboard</span>
-            </div>
-          </SidebarHeader>
-
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarMenu>
-                {boards.map((item) => (
-                  <BoardMenuItem
-                    key={item.id}
-                    item={item}
-                    pathname={pathname}
+        <Sidebar
+          collapsible="none"
+          className="w-[320px] h-screen p-4 bg-background"
+        >
+          <div className="flex h-full bg-secondary rounded-md">
+            {/* RAIL MENU */}
+            <div className="flex flex-col justify-between py-2 mr-0">
+              <div className="w-16 flex flex-col items-center gap-4">
+                <Image src="/logo.svg" alt="Flowboard" width={32} height={32} />
+                <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
+                  <Clipboard
+                    className="flex justify-center items-center text-center text-[0.5rem]"
+                    size={21}
                   />
-                ))}
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={() => setIsOpenAddBoardModal(true)}
-                    className="cursor-pointer"
-                  >
-                    <span className="text-muted-foreground font-semibold">
-                      + Add Board
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroup>
-          </SidebarContent>
-
-          <SidebarFooter className="pb-4">
-            <ToggleGroup
-              type="single"
-              value={theme}
-              onValueChange={(value) => value && setTheme(value)}
-              className="bg-muted rounded-lg w-full flex p-1.5"
-              spacing={1}
-            >
-              <ToggleGroupItem
-                value="light"
-                className="
-                  flex-1 rounded-lg
-                  data-[state=on]:bg-background
-                  data-[state=on]:text-foreground
-                  cursor-pointer
-                "
-              >
-                <Sun className="h-4 w-4 mr-1" />
-                Light
-              </ToggleGroupItem>
-
-              <ToggleGroupItem
-                value="dark"
-                className="
-                  flex-1 rounded-lg
-                  data-[state=on]:bg-background
-                  data-[state=on]:text-foreground
-                  cursor-pointer
-                "
-              >
-                <Moon className="h-4 w-4 mr-1" />
-                Dark
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </SidebarFooter>
-        </Sidebar>
-
-        <SidebarInset className="flex flex-col min-h-screen">
-          <header className="md:hidden sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-background border-b border-border">
-            <div className="flex items-center gap-0.5">
-              <Image src="/logo.svg" alt="Flow Board" width={32} height={32} />
-              <span className="font-bold text-xl">Flowboard</span>
+                  Boards
+                </button>
+              </div>
+              <div className="w-16 flex flex-col items-center gap-4">
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-2 rounded-lg hover:bg-accent"
+                >
+                  <SunMoon />
+                </button>
+              </div>
             </div>
 
-            <SidebarTrigger />
-          </header>
-          <main className="flex-1 bg-secondary m-4 rounded-lg p-6 ml-1">
-            {children}
-          </main>
+            {/* SUB MENU */}
+            <div className="flex-1 overflow-y-auto bg-background m-2 rounded-md ml-0">
+              <SidebarContent>
+                <SidebarGroup>
+                  <SidebarGroupLabel>Boards</SidebarGroupLabel>
+
+                  <SidebarMenu>
+                    {boards.map((board) => (
+                      <BoardMenuItem
+                        key={board.id}
+                        item={board}
+                        pathname={pathname}
+                      />
+                    ))}
+                    <SidebarMenuButton
+                      onClick={() => setIsOpenAddBoardModal(true)}
+                      className="cursor-pointer"
+                    >
+                      <span className="text-muted-foreground font-semibold">
+                        + Add Board
+                      </span>
+                    </SidebarMenuButton>
+                  </SidebarMenu>
+                </SidebarGroup>
+              </SidebarContent>
+            </div>
+          </div>
+        </Sidebar>
+        <SidebarInset className="h-screen overflow-auto p-4 flex-1">
+          {children}
         </SidebarInset>
       </SidebarProvider>
 
