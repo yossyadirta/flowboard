@@ -65,7 +65,7 @@ export default function DashboardLayout({
               <div className="w-16 flex flex-col items-center gap-4">
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 rounded-lg hover:bg-accent"
+                  className="p-2 rounded-lg hover:bg-accent cursor-pointer"
                 >
                   <SunMoon />
                 </button>
