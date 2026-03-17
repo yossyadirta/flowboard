@@ -17,6 +17,7 @@ type Props = {
   onUpdate: () => void;
   btnSize?: "default" | "sm" | "xs";
   btnClassName?: string;
+  dropdownAlign?: "start" | "end" | "center";
 };
 
 export function OptionDropdown({
@@ -26,6 +27,7 @@ export function OptionDropdown({
   onUpdate,
   btnSize,
   btnClassName,
+  dropdownAlign = "end",
 }: Props) {
   return (
     <div onPointerDown={(e) => e.stopPropagation()}>
@@ -35,7 +37,7 @@ export function OptionDropdown({
             <Ellipsis />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-40" align="end">
+        <DropdownMenuContent className="w-40" align={dropdownAlign}>
           <DropdownMenuItem
             className="hover:bg-sidebar-accent! hover:text-sidebar-accent-foreground!"
             onClick={onUpdate}
