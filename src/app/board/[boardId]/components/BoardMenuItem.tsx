@@ -50,7 +50,9 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
       <SidebarMenuItem>
         <SidebarMenuButton isActive={isActive}>
           <Avatar className="w-4">
-            <AvatarFallback className="bg-transparent">{emoji}</AvatarFallback>
+            <AvatarFallback className="bg-transparent text-xs">
+              {emoji}
+            </AvatarFallback>
           </Avatar>
 
           <Tooltip>
@@ -101,7 +103,7 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
               });
             }}
             dropdownAlign="start"
-            btnClassName="!bg-transparent border-0 max-h-max max-w-max p-0 focus-visible:ring-0"
+            btnClassName="!bg-transparent border-0 max-h-max max-w-max p-0 focus-visible:ring-0 cursor-pointer"
           />
         </SidebarMenuAction>
       </SidebarMenuItem>

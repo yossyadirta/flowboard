@@ -13,11 +13,16 @@ import {
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { Clipboard, SunMoon } from "lucide-react";
+import { Clipboard, SearchIcon, SunMoon } from "lucide-react";
 import BoardMenuItem from "./[boardId]/components/BoardMenuItem";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardLayout({
   children,
@@ -31,6 +36,24 @@ export default function DashboardLayout({
 
   const [isMounted, setIsMounted] = useState(false);
   const [isOpenAddBoardModal, setIsOpenAddBoardModal] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const keyword = search.toLowerCase().trim();
+  const filteredBoards = boards
+    .filter((board) => {
+      if (!keyword) return true;
+      return board.name?.toLowerCase().includes(keyword);
+    })
+    .sort((a, b) => {
+      if (!keyword) return 0;
+
+      const aStarts = a.name.toLowerCase().startsWith(keyword);
+      const bStarts = b.name.toLowerCase().startsWith(keyword);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return 0;
+    });
 
   const handleUpdateMounted = useEffectEvent(() => {
     setIsMounted(true);
@@ -73,30 +96,58 @@ export default function DashboardLayout({
             </div>
 
             {/* SUB MENU */}
-            <div className="flex-1 overflow-y-auto bg-background m-2 rounded-md ml-0">
-              <SidebarContent>
-                <SidebarGroup>
-                  <SidebarGroupLabel>Boards</SidebarGroupLabel>
+            <div className="flex-1 flex flex-col bg-background m-2 rounded-md ml-0 overflow-hidden">
+              {/* SEARCH BOX */}
+              <div className="p-3 shrink-0">
+                <InputGroup className="border-0">
+                  <InputGroupInput
+                    placeholder="Search boards..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
 
-                  <SidebarMenu>
-                    {boards.map((board) => (
-                      <BoardMenuItem
-                        key={board.id}
-                        item={board}
-                        pathname={pathname}
-                      />
-                    ))}
-                    <SidebarMenuButton
-                      onClick={() => setIsOpenAddBoardModal(true)}
-                      className="cursor-pointer"
-                    >
-                      <span className="text-muted-foreground font-semibold">
-                        + Add Board
-                      </span>
-                    </SidebarMenuButton>
-                  </SidebarMenu>
-                </SidebarGroup>
-              </SidebarContent>
+                  <InputGroupAddon>
+                    <SearchIcon className="text-muted-foreground" />
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+
+              <SidebarGroup>
+                <SidebarMenu>
+                  <SidebarMenuButton
+                    onClick={() => setIsOpenAddBoardModal(true)}
+                    className="cursor-pointer"
+                  >
+                    <span className="text-muted-foreground font-semibold">
+                      + Add Board
+                    </span>
+                  </SidebarMenuButton>
+                </SidebarMenu>
+              </SidebarGroup>
+
+              {/* BOARD LIST */}
+
+              <ScrollArea className="flex-1 min-h-0">
+                <SidebarContent>
+                  <SidebarGroup>
+                    <SidebarMenu>
+                      {filteredBoards.length === 0 ? (
+                        <div className="p-3 text-sm text-muted-foreground">
+                          No boards found
+                        </div>
+                      ) : (
+                        filteredBoards.map((board) => (
+                          <BoardMenuItem
+                            key={board.id}
+                            item={board}
+                            pathname={pathname}
+                          />
+                        ))
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroup>
+                </SidebarContent>
+              </ScrollArea>
             </div>
           </div>
         </Sidebar>
