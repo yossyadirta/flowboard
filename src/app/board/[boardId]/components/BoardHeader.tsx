@@ -22,15 +22,15 @@ const BoardHeader = ({
   closeModal,
 }: Props) => {
   return (
-    <div className="pb-4">
+    <div className="pt-6 pb-4">
       <div className="flex justify-between align-top">
-        <div className="flex flex-col gap-3">
-          <Avatar className="h-16 w-16 flex items-center justify-center transition-colors">
-            <AvatarFallback className="bg-transparent text-5xl">
+        <div className="flex flex-row gap-3 items-center align-middle">
+          <Avatar className="flex items-center justify-center transition-colors bg-secondary rounded-md w-8.5 h-8.5">
+            <AvatarFallback className="bg-secondary text-md">
               {derived.emoji}
             </AvatarFallback>
           </Avatar>
-          <h3 className="scroll-m-20 text-3xl font-bold tracking-tight text-balance">
+          <h3 className="scroll-m-20 text-xl font-bold tracking-tight text-balance align-middle">
             {derived.currentBoard?.name ?? ""}
           </h3>
         </div>

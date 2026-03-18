@@ -4,8 +4,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { SearchIcon, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { LayoutGrid, List, SearchIcon, Table, X } from "lucide-react";
 import TaskColumn from "@/components/task/TaskColumn";
 import {
   DndContext,
@@ -16,11 +15,14 @@ import {
   DragStartEvent,
   closestCorners,
 } from "@dnd-kit/core";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import TaskItem from "@/components/task/TaskItem";
 import { TASK_STATUS } from "@/schemas/task.schemas";
 import { ModalState } from "@/types/state";
 import { Board } from "@/types/board";
 import { Task } from "@/types/task";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type Props = {
   derived: {
@@ -30,6 +32,7 @@ type Props = {
     setSearch: (search: string) => void;
     setFilter: (filter: string) => void;
     visibleTasks: Task[];
+    filter: string;
   };
   dnd: {
     activeId: string | null;
@@ -57,10 +60,29 @@ const BoardColumns = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="w-3/4 flex flex-col gap-4">
-      <h3 className="font-bold text-2xl tracking-tight text-balance">Tasks</h3>
-      <div>
-        <InputGroup>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between border-b">
+        <Tabs defaultValue="kanban">
+          <TabsList variant="line" className="border-none">
+            <TabsTrigger value="kanban" className="flex items-center gap-2">
+              <LayoutGrid className="h-4 w-4" />
+              Kanban
+            </TabsTrigger>
+
+            <TabsTrigger value="table" className="flex items-center gap-2">
+              <Table className="h-4 w-4" />
+              Table
+            </TabsTrigger>
+
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <List className="h-4 w-4" />
+              List
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      <div className="flex items-center gap-2">
+        <InputGroup className="w-full max-w-60">
           <InputGroupInput
             placeholder="Search..."
             value={derived.search}
@@ -71,6 +93,7 @@ const BoardColumns = ({
           <InputGroupAddon>
             <SearchIcon className="text-muted-foreground" />
           </InputGroupAddon>
+
           {derived.search && (
             <InputGroupAddon align="inline-end">
               <button
@@ -86,9 +109,38 @@ const BoardColumns = ({
             </InputGroupAddon>
           )}
         </InputGroup>
-        <Button onClick={() => derived.setFilter("all")}>All</Button>
-        <Button onClick={() => derived.setFilter("today")}>Today</Button>
-        <Button onClick={() => derived.setFilter("overdue")}>Overdue</Button>
+        <ToggleGroup
+          spacing={2}
+          type="single"
+          size="sm"
+          variant="outline"
+          value={derived.filter}
+          onValueChange={(value) => {
+            if (value) derived.setFilter(value);
+          }}
+        >
+          <ToggleGroupItem
+            value="all"
+            aria-label="Filter all"
+            className="rounded-2xl"
+          >
+            All
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="today"
+            aria-label="Filter today"
+            className="rounded-2xl"
+          >
+            today
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="overdue"
+            aria-label="Filter overdue"
+            className="rounded-2xl"
+          >
+            Overdue
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
       <DndContext
         collisionDetection={closestCorners}
@@ -97,7 +149,7 @@ const BoardColumns = ({
         onDragOver={dnd.handleDragOver}
         onDragEnd={dnd.handleDragEnd}
       >
-        <div className="grid grid-cols-[30%_30%_30%_1fr] gap-4 items-start">
+        <div className="grid grid-cols-3 gap-4 items-start">
           {TASK_STATUS.map((status) => {
             return (
               <TaskColumn

@@ -92,6 +92,7 @@ export const useBoardDerived = ({ boardId }: Props) => {
     taskProgress,
     emoji,
     search,
+    filter,
 
     setSearch,
     setFilter,
