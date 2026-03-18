@@ -10,7 +10,6 @@ import { useBoardDnd } from "./hooks/useBoardDnd";
 import { useBoardDerived } from "./hooks/useBoardDerived";
 import BoardHeader from "./components/BoardHeader";
 import BoardColumns from "./components/BoardColumns";
-import BoardCompletion from "./components/BoardCompletion";
 import BoardModals from "./components/BoardModals";
 
 const Page = () => {
@@ -50,18 +49,15 @@ const Page = () => {
         setModalState={setModalState}
         closeModal={closeModal}
       />
-      <div className="flex gap-12">
-        <BoardColumns
-          dnd={dnd}
-          derived={derived}
-          tasks={tasks}
-          mounted={mounted}
-          modalState={modalState}
-          setModalState={setModalState}
-          boardId={boardId}
-        />
-        <BoardCompletion derived={derived} />
-      </div>
+      <BoardColumns
+        dnd={dnd}
+        derived={derived}
+        tasks={tasks}
+        mounted={mounted}
+        modalState={modalState}
+        setModalState={setModalState}
+        boardId={boardId}
+      />
       <BoardModals
         modalState={modalState}
         closeModal={closeModal}
