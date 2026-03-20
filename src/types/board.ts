@@ -5,4 +5,5 @@ export type Board = {
   icon: BoardIconId;
   name: string;
   createdAt?: number;
+  isFavorite?: boolean;
 };

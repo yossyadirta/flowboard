@@ -4,6 +4,7 @@ import { Task } from "@/types/task";
 export const ADD_BOARD = "ADD_BOARD";
 export const DELETE_BOARD = "DELETE_BOARD";
 export const UPDATE_BOARD = "UPDATE_BOARD";
+export const TOGGLE_FAVORITE_BOARD = "TOGGLE_FAVORITE_BOARD";
 
 export const ADD_TASK = "ADD_TASK";
 export const DELETE_TASK = "DELETE_TASK";
@@ -31,6 +32,13 @@ export type UpdateBoardAction = {
   type: typeof UPDATE_BOARD;
   payload: {
     board: Board;
+  };
+};
+
+export type ToggleFavoriteBoardAction = {
+  type: typeof TOGGLE_FAVORITE_BOARD;
+  payload: {
+    boardId: string;
   };
 };
 
@@ -72,6 +80,7 @@ export type Action =
   | AddBoardAction
   | DeleteBoardAction
   | UpdateBoardAction
+  | ToggleFavoriteBoardAction
   | AddTaskAction
   | UpdateTaskContentAction
   | DeleteTaskAction

@@ -1,9 +1,16 @@
 import { AppState } from "@/types/state";
-import { Action, ADD_BOARD, DELETE_BOARD, UPDATE_BOARD } from "./actions";
+import {
+  Action,
+  ADD_BOARD,
+  DELETE_BOARD,
+  TOGGLE_FAVORITE_BOARD,
+  UPDATE_BOARD,
+} from "./actions";
 
 export const boardReducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
-    case ADD_BOARD: {
+    case ADD_BOARD:
+    case UPDATE_BOARD: {
       const { board } = action.payload;
 
       return {
@@ -32,14 +39,20 @@ export const boardReducer = (state: AppState, action: Action): AppState => {
       };
     }
 
-    case UPDATE_BOARD: {
-      const { board } = action.payload;
+    case TOGGLE_FAVORITE_BOARD: {
+      const { boardId } = action.payload;
+      const board = state.boards[boardId];
+
+      if (!board) return state;
 
       return {
         ...state,
         boards: {
           ...state.boards,
-          [board.id]: board,
+          [boardId]: {
+            ...board,
+            isFavorite: !board.isFavorite,
+          },
         },
       };
     }
