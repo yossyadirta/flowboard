@@ -22,14 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <html lang="en" className={jakarta.variable} suppressHydrationWarning>
-        <head />
-        <body>
-          <Providers>{children}</Providers>
-          <Toaster />
-        </body>
-      </html>
-    </>
+    <html lang="en" className={jakarta.variable} suppressHydrationWarning>
+      <head />
+      <body>
+        <Providers>{children}</Providers>
+        <Toaster />
+      </body>
+    </html>
   );
 }
