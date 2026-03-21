@@ -9,7 +9,7 @@ import { useBoardActions } from "./hooks/useBoardActions";
 import { useBoardDnd } from "./hooks/useBoardDnd";
 import { useBoardDerived } from "./hooks/useBoardDerived";
 import BoardHeader from "./components/BoardHeader";
-import BoardColumns from "./components/BoardColumns";
+import BoardView from "./components/BoardView";
 import BoardModals from "./components/BoardModals";
 
 const Page = () => {
@@ -49,7 +49,7 @@ const Page = () => {
         setModalState={setModalState}
         closeModal={closeModal}
       />
-      <BoardColumns
+      <BoardView
         dnd={dnd}
         derived={derived}
         tasks={tasks}
