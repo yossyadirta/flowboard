@@ -60,7 +60,7 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
               <Link
                 ref={textRef}
                 href={href}
-                className={`flex-1 min-w-0 truncate font-semibold ${
+                className={`flex-1 min-w-0 truncate font-medium ${
                   isActive ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
@@ -80,31 +80,34 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
             "hover:bg-transparent not-last-of-type:focus:bg-transparent active:bg-transparent focus-visible:ring-0 focus-visible:outline-none data-[state=open]:bg-transparent focus:outline-none outline-none",
             isOpen && "opacity-100 pointer-events-auto",
           )}
+          asChild
         >
-          <OptionDropdown
-            open={modalState.type === "option-board"}
-            onOpenChange={() => {
-              if (modalState.type === "option-board") {
-                closeModal();
-              } else {
+          <div className="flex items-center">
+            <OptionDropdown
+              open={modalState.type === "option-board"}
+              onOpenChange={() => {
+                if (modalState.type === "option-board") {
+                  closeModal();
+                } else {
+                  setModalState({
+                    type: "option-board",
+                  });
+                }
+              }}
+              onDelete={() => {
                 setModalState({
-                  type: "option-board",
+                  type: "delete-board",
                 });
-              }
-            }}
-            onDelete={() => {
-              setModalState({
-                type: "delete-board",
-              });
-            }}
-            onUpdate={() => {
-              setModalState({
-                type: "edit-board",
-              });
-            }}
-            dropdownAlign="start"
-            btnClassName="!bg-transparent border-0 max-h-max max-w-max p-0 focus-visible:ring-0 cursor-pointer"
-          />
+              }}
+              onUpdate={() => {
+                setModalState({
+                  type: "edit-board",
+                });
+              }}
+              dropdownAlign="start"
+              btnClassName="!bg-transparent border-0 max-h-max max-w-max p-0 focus-visible:ring-0 cursor-pointer"
+            />
+          </div>
         </SidebarMenuAction>
       </SidebarMenuItem>
 

@@ -13,6 +13,8 @@ import {
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 import { Clipboard, SearchIcon, SunMoon } from "lucide-react";
@@ -55,6 +57,9 @@ export default function DashboardLayout({
       return 0;
     });
 
+  const favoriteBoards = filteredBoards.filter((b) => b.isFavorite);
+  const otherBoards = filteredBoards.filter((b) => !b.isFavorite);
+
   const handleUpdateMounted = useEffectEvent(() => {
     setIsMounted(true);
   });
@@ -67,11 +72,10 @@ export default function DashboardLayout({
 
   return (
     <>
-      <SidebarProvider>
-        <Sidebar
-          collapsible="none"
-          className="w-[320px] h-screen p-4 bg-background"
-        >
+      <SidebarProvider
+        style={{ "--sidebar-width": "360px" } as React.CSSProperties}
+      >
+        <Sidebar className="h-screen p-4 bg-background">
           <div className="flex h-full bg-secondary rounded-md">
             {/* RAIL MENU */}
             <div className="flex flex-col justify-between py-2 mr-0">
@@ -126,24 +130,41 @@ export default function DashboardLayout({
               </SidebarGroup>
 
               {/* BOARD LIST */}
-
-              <ScrollArea className="flex-1 min-h-0">
+              <ScrollArea className="flex-1 min-h-0 [&>div>div]:!block">
                 <SidebarContent>
                   <SidebarGroup>
+                    <SidebarGroupLabel>Favorites</SidebarGroupLabel>
                     <SidebarMenu>
-                      {filteredBoards.length === 0 ? (
-                        <div className="p-3 text-sm text-muted-foreground">
-                          No boards found
-                        </div>
+                      {favoriteBoards?.length > 0 ? (
+                        favoriteBoards.map((board) => (
+                          <BoardMenuItem
+                            item={board}
+                            pathname={pathname}
+                            key={board.id}
+                          />
+                        ))
                       ) : (
-                        filteredBoards.map((board) => (
+                        <SidebarMenuItem>
+                          <SidebarMenuButton className="cursor-default hover:bg-transparent">
+                            <span className="flex-1 min-w-0 truncate font-medium text-muted-foreground">
+                              No favorite boards yet
+                            </span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroup>
+                  <SidebarGroup>
+                    <SidebarGroupLabel>All Boards</SidebarGroupLabel>
+                    <SidebarMenu>
+                      {otherBoards.length > 0 &&
+                        otherBoards.map((board) => (
                           <BoardMenuItem
                             key={board.id}
                             item={board}
                             pathname={pathname}
                           />
-                        ))
-                      )}
+                        ))}
                     </SidebarMenu>
                   </SidebarGroup>
                 </SidebarContent>
