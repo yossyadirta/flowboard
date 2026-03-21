@@ -1,28 +1,24 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { LayoutGrid, List, SearchIcon, Table, X } from "lucide-react";
-import TaskColumn from "@/components/task/TaskColumn";
 import {
-  DndContext,
   DragCancelEvent,
   DragEndEvent,
   DragOverEvent,
-  DragOverlay,
   DragStartEvent,
-  closestCorners,
 } from "@dnd-kit/core";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import TaskItem from "@/components/task/TaskItem";
-import { TASK_STATUS } from "@/schemas/task.schemas";
 import { ModalState } from "@/types/state";
 import { Board } from "@/types/board";
 import { Task } from "@/types/task";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import BoardKanbanView from "./BoardKanbanView";
+import BoardTableView from "./BoardTableView";
+import BoardListView from "./BoardListView";
 
 type Props = {
   derived: {
@@ -58,23 +54,33 @@ const BoardColumns = ({
   boardId,
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [view, setView] = useState("kanban");
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between border-b">
-        <Tabs defaultValue="kanban">
+        <Tabs value={view} onValueChange={setView}>
           <TabsList variant="line" className="border-none">
-            <TabsTrigger value="kanban" className="flex items-center gap-2">
+            <TabsTrigger
+              value="kanban"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <LayoutGrid className="h-4 w-4" />
               Kanban
             </TabsTrigger>
 
-            <TabsTrigger value="table" className="flex items-center gap-2">
+            <TabsTrigger
+              value="table"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <Table className="h-4 w-4" />
               Table
             </TabsTrigger>
 
-            <TabsTrigger value="list" className="flex items-center gap-2">
+            <TabsTrigger
+              value="list"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <List className="h-4 w-4" />
               List
             </TabsTrigger>
@@ -122,60 +128,52 @@ const BoardColumns = ({
           <ToggleGroupItem
             value="all"
             aria-label="Filter all"
-            className="rounded-2xl"
+            className="rounded-2xl cursor-pointer"
           >
             All
           </ToggleGroupItem>
           <ToggleGroupItem
             value="today"
             aria-label="Filter today"
-            className="rounded-2xl"
+            className="rounded-2xl cursor-pointer"
           >
             today
           </ToggleGroupItem>
           <ToggleGroupItem
             value="overdue"
             aria-label="Filter overdue"
-            className="rounded-2xl"
+            className="rounded-2xl cursor-pointer"
           >
             Overdue
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <DndContext
-        collisionDetection={closestCorners}
-        onDragCancel={dnd.handleDragCancel}
-        onDragStart={dnd.handleDragStart}
-        onDragOver={dnd.handleDragOver}
-        onDragEnd={dnd.handleDragEnd}
-      >
-        <div className="grid grid-cols-3 gap-4 items-start">
-          {TASK_STATUS.map((status) => {
-            return (
-              <TaskColumn
-                key={status.value}
-                status={status}
-                tasks={derived.visibleTasks}
-                setModalState={setModalState}
-                modalState={modalState}
-                boardId={boardId}
-                activeId={dnd.activeId}
-              />
-            );
-          })}
-          <DragOverlay>
-            {dnd.activeId ? (
-              <TaskItem
-                data={tasks[dnd.activeId]}
-                isOverlay
-                modalState={modalState}
-                setModalState={setModalState}
-                activeId={null}
-              />
-            ) : null}
-          </DragOverlay>
-        </div>
-      </DndContext>
+      {view === "kanban" && (
+        <BoardKanbanView
+          dnd={dnd}
+          derived={derived}
+          tasks={tasks}
+          modalState={modalState}
+          setModalState={setModalState}
+          boardId={boardId}
+        />
+      )}
+
+      {view === "table" && (
+        <BoardTableView
+          tasks={derived.visibleTasks}
+          modalState={modalState}
+          setModalState={setModalState}
+        />
+      )}
+
+      {view === "list" && (
+        <BoardListView
+          tasks={derived.visibleTasks}
+          modalState={modalState}
+          setModalState={setModalState}
+        />
+      )}
     </div>
   );
 };
