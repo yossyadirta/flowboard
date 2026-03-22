@@ -12,7 +12,7 @@ type Props = {
 export const useBoardActions = ({ boardId }: Props) => {
   const router = useRouter();
 
-  const { boards, deleteBoard } = useBoards();
+  const { boards, deleteBoard, updateBoardFavorite } = useBoards();
 
   const getNextBoardId = () => {
     const index = boards.findIndex((item) => item.id === boardId);
@@ -38,7 +38,22 @@ export const useBoardActions = ({ boardId }: Props) => {
     });
   };
 
+  const onToggleFavorite = (boardId: string) => {
+    const board = boards.find((item) => item.id === boardId);
+    if (!board) return;
+    const isFavorite = board.isFavorite;
+    updateBoardFavorite(boardId);
+    toast.success(
+      `Board has been ${!isFavorite ? "added to" : "removed from"} favorites`,
+      {
+        description: formatDate(new Date(), true),
+        position: "top-center",
+      },
+    );
+  };
+
   return {
     handleDeleteBoard,
+    onToggleFavorite,
   };
 };

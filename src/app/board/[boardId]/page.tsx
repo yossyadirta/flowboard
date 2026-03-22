@@ -48,6 +48,8 @@ const Page = () => {
         modalState={modalState}
         setModalState={setModalState}
         closeModal={closeModal}
+        onToggleFavorite={actions.onToggleFavorite}
+        isFavorite={derived.currentBoard?.isFavorite ?? false}
       />
       <BoardView
         dnd={dnd}

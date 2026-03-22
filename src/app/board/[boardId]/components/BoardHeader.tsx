@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Board } from "@/types/board";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { ModalState } from "@/types/state";
+import { Star } from "lucide-react";
 
 type Props = {
   derived: {
@@ -13,6 +14,8 @@ type Props = {
   modalState: ModalState;
   setModalState: (data: ModalState) => void;
   closeModal: () => void;
+  onToggleFavorite: (boardId: string) => void;
+  isFavorite: boolean;
 };
 
 const BoardHeader = ({
@@ -20,6 +23,8 @@ const BoardHeader = ({
   setModalState,
   modalState,
   closeModal,
+  onToggleFavorite,
+  isFavorite,
 }: Props) => {
   return (
     <div className="pt-6 pb-4">
@@ -35,6 +40,22 @@ const BoardHeader = ({
           </h3>
         </div>
         <div>
+          <button
+            onClick={() => {
+              if (derived.currentBoard?.id) {
+                onToggleFavorite(derived.currentBoard.id);
+              }
+            }}
+            className="p-2 rounded-md hover:bg-muted transition-colors"
+          >
+            <Star
+              className={`h-5 w-5 transition-colors ${
+                isFavorite
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-muted-foreground"
+              }`}
+            />
+          </button>
           <OptionDropdown
             open={modalState.type === "option-board"}
             onOpenChange={() => {
