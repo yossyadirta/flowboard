@@ -146,7 +146,7 @@ export default function DashboardLayout({
                       ) : (
                         <SidebarMenuItem>
                           <SidebarMenuButton className="cursor-default hover:bg-transparent">
-                            <span className="flex-1 min-w-0 truncate font-medium text-muted-foreground">
+                            <span className="flex-1 min-w-0 truncate font-light text-muted-foreground">
                               No favorite boards yet
                             </span>
                           </SidebarMenuButton>
