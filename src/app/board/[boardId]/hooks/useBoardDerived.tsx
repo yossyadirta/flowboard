@@ -3,7 +3,8 @@
 import { BOARD_ICONS_MAP } from "@/components/board/BoardIcons";
 import { useBoards } from "@/hooks/useBoards";
 import { useTasks } from "@/hooks/useTasks";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   boardId: string;
@@ -13,15 +14,20 @@ export const useBoardDerived = ({ boardId }: Props) => {
   const { mappedTasks } = useTasks();
   const { boards } = useBoards();
 
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const searchParams = useSearchParams();
 
-  const formatProgressColor = (percent: number) => {
-    if (percent < 30) return "bg-red-500";
-    if (percent < 70) return "bg-yellow-500";
+  const search = searchParams.get("search") || "";
+  const filter = searchParams.get("filter") || "all";
 
-    return "bg-green-500";
+  const allowedViews = ["kanban", "table", "list"] as const;
+  type View = (typeof allowedViews)[number];
+
+  const isValidView = (value: string | null): value is View => {
+    return !!value && allowedViews.includes(value as View);
   };
+
+  const rawView = searchParams.get("view");
+  const view: View = isValidView(rawView) ? rawView : "kanban";
 
   const currentBoard = useMemo(() => {
     if (!boardId) return null;
@@ -70,16 +76,17 @@ export const useBoardDerived = ({ boardId }: Props) => {
   };
 
   const visibleTasks = useMemo(() => {
-    return mappedTasks
-      .filter((item) => boardId === item.boardId)
-      .filter((task) => {
-        if (filter === "today") return isToday(task.dueDate);
-        if (filter === "overdue") return isOverdue(task.dueDate);
-        return true;
-      })
-      .filter((task) =>
-        task.title.toLowerCase().includes(search.toLowerCase()),
-      );
+    return mappedTasks.filter((task) => {
+      if (task.boardId !== boardId) return false;
+
+      if (filter === "today" && !isToday(task.dueDate)) return false;
+      if (filter === "overdue" && !isOverdue(task.dueDate)) return false;
+
+      if (search && !task.title.toLowerCase().includes(search.toLowerCase()))
+        return false;
+
+      return true;
+    });
   }, [filter, search, mappedTasks, boardId]);
 
   return {
@@ -93,9 +100,6 @@ export const useBoardDerived = ({ boardId }: Props) => {
     emoji,
     search,
     filter,
-
-    setSearch,
-    setFilter,
-    formatProgressColor,
+    view,
   };
 };

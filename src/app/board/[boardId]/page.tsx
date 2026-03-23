@@ -59,6 +59,7 @@ const Page = () => {
         modalState={modalState}
         setModalState={setModalState}
         boardId={boardId}
+        actions={actions}
       />
       <BoardModals
         modalState={modalState}

@@ -3,7 +3,7 @@
 import { useBoards } from "@/hooks/useBoards";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 type Props = {
   boardId: string;
@@ -11,8 +11,22 @@ type Props = {
 
 export const useBoardActions = ({ boardId }: Props) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const { boards, deleteBoard, updateBoardFavorite } = useBoards();
+
+  const updateQuery = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const getNextBoardId = () => {
     const index = boards.findIndex((item) => item.id === boardId);
@@ -55,5 +69,8 @@ export const useBoardActions = ({ boardId }: Props) => {
   return {
     handleDeleteBoard,
     onToggleFavorite,
+    setSearch: (value: string) => updateQuery("search", value),
+    setFilter: (value: string) => updateQuery("filter", value),
+    setView: (value: string) => updateQuery("view", value),
   };
 };

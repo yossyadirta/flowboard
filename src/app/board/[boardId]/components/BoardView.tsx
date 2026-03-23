@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -25,10 +25,14 @@ type Props = {
     emoji: string;
     currentBoard: Board | null;
     search: string;
-    setSearch: (search: string) => void;
-    setFilter: (filter: string) => void;
     visibleTasks: Task[];
     filter: string;
+    view: string;
+  };
+  actions: {
+    setSearch: (search: string) => void;
+    setFilter: (filter: string) => void;
+    setView: (view: string) => void;
   };
   dnd: {
     activeId: string | null;
@@ -52,14 +56,14 @@ const BoardColumns = ({
   modalState,
   setModalState,
   boardId,
+  actions,
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [view, setView] = useState("kanban");
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between border-b">
-        <Tabs value={view} onValueChange={setView}>
+        <Tabs value={derived.view} onValueChange={actions.setView}>
           <TabsList variant="line" className="border-none">
             <TabsTrigger
               value="kanban"
@@ -92,7 +96,7 @@ const BoardColumns = ({
           <InputGroupInput
             placeholder="Search..."
             value={derived.search}
-            onChange={(e) => derived.setSearch(e.target.value)}
+            onChange={(e) => actions.setSearch(e.target.value)}
             ref={inputRef}
           />
 
@@ -105,7 +109,7 @@ const BoardColumns = ({
               <button
                 type="button"
                 onClick={() => {
-                  derived.setSearch("");
+                  actions.setSearch("");
                   inputRef.current?.focus();
                 }}
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -122,7 +126,7 @@ const BoardColumns = ({
           variant="outline"
           value={derived.filter}
           onValueChange={(value) => {
-            if (value) derived.setFilter(value);
+            if (value) actions.setFilter(value);
           }}
         >
           <ToggleGroupItem
@@ -148,7 +152,7 @@ const BoardColumns = ({
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      {view === "kanban" && (
+      {derived.view === "kanban" && (
         <BoardKanbanView
           dnd={dnd}
           derived={derived}
@@ -159,19 +163,21 @@ const BoardColumns = ({
         />
       )}
 
-      {view === "table" && (
+      {derived.view === "table" && (
         <BoardTableView
           tasks={derived.visibleTasks}
           modalState={modalState}
           setModalState={setModalState}
+          boardId={boardId}
         />
       )}
 
-      {view === "list" && (
+      {derived.view === "list" && (
         <BoardListView
           tasks={derived.visibleTasks}
           modalState={modalState}
           setModalState={setModalState}
+          boardId={boardId}
         />
       )}
     </div>

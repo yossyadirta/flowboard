@@ -20,8 +20,6 @@ type Props = {
     emoji: string;
     currentBoard: Board | null;
     search: string;
-    setSearch: (search: string) => void;
-    setFilter: (filter: string) => void;
     visibleTasks: Task[];
     filter: string;
   };
