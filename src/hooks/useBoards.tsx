@@ -2,7 +2,12 @@
 
 import { Board } from "@/types/board";
 import { useAppState } from "./useAppState";
-import { ADD_BOARD, DELETE_BOARD, UPDATE_BOARD } from "@/state/actions";
+import {
+  ADD_BOARD,
+  DELETE_BOARD,
+  TOGGLE_FAVORITE_BOARD,
+  UPDATE_BOARD,
+} from "@/state/actions";
 
 export const useBoards = () => {
   const { state, dispatch } = useAppState();
@@ -38,10 +43,23 @@ export const useBoards = () => {
     });
   };
 
+  const updateBoardFavorite = (boardId: string) => {
+    const board = boards.find((item) => item.id === boardId);
+    if (!board) return;
+
+    dispatch({
+      type: TOGGLE_FAVORITE_BOARD,
+      payload: {
+        boardId,
+      },
+    });
+  };
+
   return {
     boards,
     addBoard,
     deleteBoard,
     updateBoard,
+    updateBoardFavorite,
   };
 };
