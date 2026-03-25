@@ -172,7 +172,7 @@ export default function DashboardLayout({
             </div>
           </div>
         </Sidebar>
-        <SidebarInset className="h-screen overflow-auto p-4 flex-1">
+        <SidebarInset className="h-screen overflow-hidden p-4 flex-1">
           {children}
         </SidebarInset>
       </SidebarProvider>

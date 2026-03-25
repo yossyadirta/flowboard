@@ -41,7 +41,7 @@ const Page = () => {
   }
 
   return (
-    <div>
+    <div className="h-full flex flex-col overflow-hidden">
       <BoardHeader
         derived={derived}
         mounted={mounted}
