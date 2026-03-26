@@ -122,7 +122,7 @@ export default function DashboardLayout({
                     onClick={() => setIsOpenAddBoardModal(true)}
                     className="cursor-pointer"
                   >
-                    <span className="text-muted-foreground font-semibold">
+                    <span className="text-muted-foreground font-medium">
                       + Add Board
                     </span>
                   </SidebarMenuButton>
@@ -146,7 +146,7 @@ export default function DashboardLayout({
                       ) : (
                         <SidebarMenuItem>
                           <SidebarMenuButton className="cursor-default hover:bg-transparent">
-                            <span className="flex-1 min-w-0 truncate font-light text-muted-foreground">
+                            <span className="flex-1 min-w-0 truncate text-muted-foreground">
                               No favorite boards yet
                             </span>
                           </SidebarMenuButton>
