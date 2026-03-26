@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { Ellipsis, PencilIcon, TrashIcon } from "lucide-react";
 
 type Props = {
@@ -33,20 +34,28 @@ export function OptionDropdown({
     <div onPointerDown={(e) => e.stopPropagation()}>
       <DropdownMenu open={open} onOpenChange={onOpenChange}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size={btnSize} className={btnClassName}>
+          <Button
+            variant="outline"
+            size={btnSize}
+            className={cn("cursor-pointer", btnClassName)}
+          >
             <Ellipsis />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40" align={dropdownAlign}>
           <DropdownMenuItem
-            className="hover:bg-sidebar-accent! hover:text-sidebar-accent-foreground!"
+            className="hover:bg-sidebar-accent! hover:text-sidebar-accent-foreground! cursor-pointer"
             onClick={onUpdate}
           >
             <PencilIcon />
             Edit
           </DropdownMenuItem>
           <DropdownMenuGroup>
-            <DropdownMenuItem variant="destructive" onClick={onDelete}>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={onDelete}
+              className="cursor-pointer"
+            >
               <TrashIcon />
               Delete
             </DropdownMenuItem>
