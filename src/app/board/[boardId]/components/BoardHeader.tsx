@@ -39,17 +39,17 @@ const BoardHeader = ({
             {derived.currentBoard?.name ?? ""}
           </h3>
         </div>
-        <div>
+        <div className="flex">
           <button
             onClick={() => {
               if (derived.currentBoard?.id) {
                 onToggleFavorite(derived.currentBoard.id);
               }
             }}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
+            className="rounded-md transition-colors cursor-pointer"
           >
             <Star
-              className={`h-5 w-5 transition-colors ${
+              className={`h-4 w-4 transition-colors ${
                 isFavorite
                   ? "fill-yellow-400 text-yellow-400"
                   : "text-muted-foreground"
@@ -77,7 +77,16 @@ const BoardHeader = ({
                 type: "edit-board",
               });
             }}
-            btnClassName="bg-transparent border-0"
+            btnClassName="
+              shadow-none 
+              hover:bg-transparent
+              focus:outline-none 
+              focus:ring-0 
+              focus-visible:outline-none 
+              focus-visible:ring-0 
+              data-[state=open]:bg-transparent
+              border-0
+              "
           />
         </div>
       </div>
