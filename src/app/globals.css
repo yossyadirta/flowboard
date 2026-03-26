@@ -47,44 +47,33 @@
 :root {
   --radius: 0.625rem;
 
-  /* APP BACKGROUND (area luar) */
-  --background: oklch(0.97 0.01 270);
-
-  /* TEXT */
+  --background: oklch(100% 0.00011 271.152);
+  
   --foreground: oklch(0.23 0.02 270);
 
-  /* CARD */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.23 0.02 270);
 
-  /* POPOVER */
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.23 0.02 270);
 
-  /* PRIMARY PURPLE */
   --primary: oklch(0.62 0.24 285);
   --primary-foreground: oklch(0.99 0 0);
 
-  /* HOVER / ACCENT */
   --accent: oklch(0.95 0.02 270);
   --accent-foreground: oklch(0.23 0.02 270);
 
-  /* SECONDARY SURFACE */
   --secondary: oklch(0.96 0.01 270);
   --secondary-foreground: oklch(0.23 0.02 270);
 
-  /* MUTED */
   --muted: oklch(0.94 0.01 270);
   --muted-foreground: oklch(0.55 0.03 270);
 
-  /* BORDER */
   --border: oklch(0.9 0.01 270);
   --input: oklch(0.93 0.01 270);
 
-  /* RING */
   --ring: oklch(0.62 0.24 285);
 
-  /* SIDEBAR */
   --sidebar: oklch(0.94 0.015 270);
   --sidebar-foreground: oklch(0.23 0.02 270);
 
