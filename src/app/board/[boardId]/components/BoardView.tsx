@@ -4,7 +4,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { LayoutGrid, List, SearchIcon, Table, X } from "lucide-react";
+import { List, SearchIcon, SquareKanban, Table2, X } from "lucide-react";
 import {
   DragCancelEvent,
   DragEndEvent,
@@ -19,6 +19,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import BoardKanbanView from "./BoardKanbanView";
 import BoardTableView from "./BoardTableView";
 import BoardListView from "./BoardListView";
+import { cn } from "@/lib/utils";
 
 type Props = {
   derived: {
@@ -28,6 +29,10 @@ type Props = {
     visibleTasks: Task[];
     filter: string;
     view: string;
+    totalDoneTask: number;
+    totalInprogressTask: number;
+    totalTodoTask: number;
+    totalTask: number;
   };
   actions: {
     setSearch: (search: string) => void;
@@ -61,7 +66,7 @@ const BoardColumns = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 overflow-hidden">
       <div className="flex items-center justify-between border-b">
         <Tabs value={derived.view} onValueChange={actions.setView}>
           <TabsList variant="line" className="border-none">
@@ -69,15 +74,25 @@ const BoardColumns = ({
               value="kanban"
               className="flex items-center gap-2 cursor-pointer"
             >
-              <LayoutGrid className="h-4 w-4" />
+              <SquareKanban
+                className={cn(
+                  "h-6 w-6",
+                  derived.view === "kanban" ? "text-primary" : "",
+                )}
+              />
               Kanban
             </TabsTrigger>
 
             <TabsTrigger
               value="table"
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-2 cursor-pointer hover:foreground/80"
             >
-              <Table className="h-4 w-4" />
+              <Table2
+                className={cn(
+                  "h-6 w-6",
+                  derived.view === "table" ? "text-primary" : "",
+                )}
+              />
               Table
             </TabsTrigger>
 
@@ -85,7 +100,12 @@ const BoardColumns = ({
               value="list"
               className="flex items-center gap-2 cursor-pointer"
             >
-              <List className="h-4 w-4" />
+              <List
+                className={cn(
+                  "h-6 w-6",
+                  derived.view === "list" ? "text-primary" : "",
+                )}
+              />
               List
             </TabsTrigger>
           </TabsList>
@@ -152,34 +172,36 @@ const BoardColumns = ({
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      {derived.view === "kanban" && (
-        <BoardKanbanView
-          dnd={dnd}
-          derived={derived}
-          tasks={tasks}
-          modalState={modalState}
-          setModalState={setModalState}
-          boardId={boardId}
-        />
-      )}
+      <div className="flex-1 overflow-hidden">
+        {derived.view === "kanban" && (
+          <BoardKanbanView
+            dnd={dnd}
+            derived={derived}
+            tasks={tasks}
+            modalState={modalState}
+            setModalState={setModalState}
+            boardId={boardId}
+          />
+        )}
 
-      {derived.view === "table" && (
-        <BoardTableView
-          tasks={derived.visibleTasks}
-          modalState={modalState}
-          setModalState={setModalState}
-          boardId={boardId}
-        />
-      )}
+        {derived.view === "table" && (
+          <BoardTableView
+            tasks={derived.visibleTasks}
+            modalState={modalState}
+            setModalState={setModalState}
+            boardId={boardId}
+          />
+        )}
 
-      {derived.view === "list" && (
-        <BoardListView
-          tasks={derived.visibleTasks}
-          modalState={modalState}
-          setModalState={setModalState}
-          boardId={boardId}
-        />
-      )}
+        {derived.view === "list" && (
+          <BoardListView
+            tasks={derived.visibleTasks}
+            modalState={modalState}
+            setModalState={setModalState}
+            boardId={boardId}
+          />
+        )}
+      </div>
     </div>
   );
 };

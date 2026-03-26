@@ -22,6 +22,10 @@ type Props = {
     search: string;
     visibleTasks: Task[];
     filter: string;
+    totalDoneTask: number;
+    totalInprogressTask: number;
+    totalTodoTask: number;
+    totalTask: number;
   };
   dnd: {
     activeId: string | null;
@@ -53,7 +57,7 @@ const BoardKanbanView = ({
       onDragOver={dnd.handleDragOver}
       onDragEnd={dnd.handleDragEnd}
     >
-      <div className="grid grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-3 gap-4 items-start h-full overflow-hidden">
         {TASK_STATUS.map((status) => {
           return (
             <TaskColumn
@@ -64,6 +68,7 @@ const BoardKanbanView = ({
               modalState={modalState}
               boardId={boardId}
               activeId={dnd.activeId}
+              derived={derived}
             />
           );
         })}
