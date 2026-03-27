@@ -96,7 +96,7 @@ const TaskColumn = ({
           });
         }}
         variant="outline"
-        className="shrink-0 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer border-0 bg-transparent! hover:bg-transparent focus:ring-0 data-[state=open]:bg-transparent p-0! justify-start"
+        className="shrink-0 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer border-0 bg-transparent! hover:bg-transparent focus:ring-0 data-[state=open]:bg-transparent p-0! justify-start shadow-none"
       >
         <PlusIcon size={16} />
         Add New Task
