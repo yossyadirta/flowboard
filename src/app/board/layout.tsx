@@ -76,7 +76,7 @@ export default function DashboardLayout({
         style={{ "--sidebar-width": "360px" } as React.CSSProperties}
       >
         <Sidebar className="h-screen p-4 bg-background">
-          <div className="flex h-full bg-secondary rounded-md">
+          <div className="flex h-full bg-secondary rounded-2xl">
             {/* RAIL MENU */}
             <div className="flex flex-col justify-between py-2 mr-0">
               <div className="w-16 flex flex-col items-center gap-4">
@@ -100,7 +100,7 @@ export default function DashboardLayout({
             </div>
 
             {/* SUB MENU */}
-            <div className="flex-1 flex flex-col bg-background m-2 rounded-md ml-0 overflow-hidden">
+            <div className="flex-1 flex flex-col bg-background m-2 rounded-2xl ml-0 overflow-hidden">
               {/* SEARCH BOX */}
               <div className="p-3 shrink-0">
                 <InputGroup className="border-0">
@@ -130,7 +130,7 @@ export default function DashboardLayout({
               </SidebarGroup>
 
               {/* BOARD LIST */}
-              <ScrollArea className="flex-1 min-h-0 [&>div>div]:!block">
+              <ScrollArea className="flex-1 min-h-0 [&>div>div]:block!">
                 <SidebarContent>
                   <SidebarGroup>
                     <SidebarGroupLabel>Favorites</SidebarGroupLabel>
