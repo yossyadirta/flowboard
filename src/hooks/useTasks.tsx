@@ -20,7 +20,7 @@ export const useTasks = () => {
     boardId: string,
     title: string,
     status: TaskStatus,
-    dueDate: Date,
+    dueDate?: Date,
   ) => {
     const sameColumnTasks = mappedTasks.filter(
       (task) => task.boardId === boardId && task.status === status,
