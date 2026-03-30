@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   TASK_STATUS,
   TaskFormValues,
@@ -33,6 +33,31 @@ import {
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { Textarea } from "../ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import Image from "next/image";
+
+const COLORS = [
+  "#ff6565",
+  "#f87171",
+  "#fb923c",
+  "#facc15",
+  "#4ade80",
+  "#34d399",
+  "#60a5fa",
+  "#818cf8",
+  "#a78bfa",
+  "#de8bfa",
+];
+
+const IMAGES = [
+  "/task-cover-1.jpg",
+  "/task-cover-2.jpg",
+  "/task-cover-3.jpg",
+  "/task-cover-4.jpg",
+  "/task-cover-5.jpg",
+  "/task-cover-6.jpg",
+];
 
 type Props = {
   onSubmit: (values: TaskFormValues) => void;
@@ -54,7 +79,9 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
       status: defaultValues?.status ?? undefined,
       dueDate: defaultValues?.dueDate
         ? new Date(defaultValues.dueDate)
-        : new Date(),
+        : undefined,
+      description: defaultValues?.description ?? "",
+      cover: defaultValues?.cover ?? { type: "none" },
     },
   });
 
@@ -104,6 +131,15 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
             </Field>
           )}
         />
+        <Field>
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            {...register("description")}
+            id="description"
+            placeholder="Add a more detailed description..."
+            className="w-full rounded-md border px-3 py-2 text-sm resize-none"
+          />
+        </Field>
         <Controller
           name="dueDate"
           control={control}
@@ -117,34 +153,34 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
                 <InputGroup>
                   <InputGroupInput
                     value={value ? formatDate(value) : ""}
-                    placeholder="Select date"
+                    placeholder="No due date"
                     readOnly
                   />
+
+                  {value && (
+                    <InputGroupButton
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onChange(null)}
+                    >
+                      ✕
+                    </InputGroupButton>
+                  )}
 
                   <InputGroupAddon align="inline-end">
                     <Popover>
                       <PopoverTrigger asChild>
-                        <InputGroupButton
-                          variant="ghost"
-                          size="icon-xs"
-                          aria-label="Select date"
-                        >
+                        <InputGroupButton variant="ghost" size="icon-xs">
                           <CalendarIcon />
                         </InputGroupButton>
                       </PopoverTrigger>
 
-                      <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="end"
-                      >
+                      <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={value}
-                          onSelect={(date) => {
-                            if (date) {
-                              onChange(date);
-                            }
-                          }}
+                          selected={value ?? undefined}
+                          onSelect={(date) => onChange(date ?? null)}
                         />
                       </PopoverContent>
                     </Popover>
@@ -154,7 +190,105 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
             );
           }}
         />
+        <Controller
+          name="cover"
+          control={control}
+          render={({ field }) => {
+            const cover = field.value ?? { type: "none" };
+
+            return (
+              <Field>
+                <Label>Cover</Label>
+
+                <ToggleGroup
+                  type="single"
+                  value={cover.type}
+                  onValueChange={(val) => {
+                    if (!val) return;
+                    field.onChange({ type: val });
+                  }}
+                  className="justify-start"
+                >
+                  <ToggleGroupItem value="none">None</ToggleGroupItem>
+                  <ToggleGroupItem value="color">Color</ToggleGroupItem>
+                  <ToggleGroupItem value="image">Image</ToggleGroupItem>
+                </ToggleGroup>
+
+                {cover.type === "color" && (
+                  <div className="grid grid-cols-5 gap-2 mt-2">
+                    {COLORS.map((c) => (
+                      <button
+                        type="button"
+                        key={c}
+                        onClick={() =>
+                          field.onChange({ type: "color", value: c })
+                        }
+                        className={`w-full h-8 rounded-md border ${
+                          cover.value === c ? "ring-2 ring-primary" : ""
+                        }`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {cover.type === "image" && (
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {IMAGES.map((img) => (
+                      <CoverImageItem
+                        key={img}
+                        img={img}
+                        selected={cover.value === img}
+                        onClick={() =>
+                          field.onChange({ type: "image", value: img })
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </Field>
+            );
+          }}
+        />
       </FieldGroup>
     </form>
+  );
+}
+
+function CoverImageItem({
+  img,
+  selected,
+  onClick,
+}: {
+  img: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative rounded-md overflow-hidden border ${
+        selected ? "ring-2 ring-primary" : ""
+      }`}
+    >
+      <div className="relative w-full h-16">
+        {loading && <div className="absolute inset-0 bg-muted animate-pulse" />}
+
+        <Image
+          src={img}
+          alt="cover"
+          fill
+          className={`object-cover transition-opacity ${
+            loading ? "opacity-0" : "opacity-100"
+          }`}
+          sizes="120px"
+          priority
+          onLoadingComplete={() => setLoading(false)}
+        />
+      </div>
+    </button>
   );
 }

@@ -1,5 +1,10 @@
 export type TaskStatus = "todo" | "in-progress" | "done";
 
+export type TaskCover =
+  | { type: "none" }
+  | { type: "color"; value: string }
+  | { type: "image"; value: string };
+
 export type Task = {
   id: string;
   title: string;
@@ -8,4 +13,6 @@ export type Task = {
   order: number;
   createdAt: number;
   dueDate?: Date;
+  cover?: TaskCover;
+  description?: string;
 };
