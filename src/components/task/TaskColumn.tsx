@@ -10,6 +10,8 @@ import {
 import { useDroppable } from "@dnd-kit/core";
 import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
+import { useTasks } from "@/hooks/useTasks";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   status: {
@@ -42,6 +44,34 @@ const TaskColumn = ({
     id: status.value,
   });
 
+  const { addTask } = useTasks();
+  const [isAdding, setIsAdding] = useState(false);
+  const [title, setTitle] = useState("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (isAdding) inputRef.current?.focus();
+  }, [isAdding]);
+
+  const handleCreateTask = () => {
+    if (title.trim()) {
+      addTask(boardId, title.trim(), status.value);
+      setTitle("");
+    }
+    setIsAdding(false);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleCreateTask();
+    }
+    if (e.key === "Escape") {
+      setIsAdding(false);
+      setTitle("");
+    }
+  };
+
   const columnTasks = tasks
     .filter((item) => item.status === status.value && boardId === item.boardId)
     .sort((a, b) => a.order - b.order);
@@ -59,17 +89,17 @@ const TaskColumn = ({
     <Card
       ref={setNodeRef}
       id={status.value}
-      className="p-3 flex flex-col h-auto max-h-full overflow-hidden gap-2"
+      className="p-3 flex flex-col h-auto max-h-full overflow-hidden gap-3 bg-secondary border-0"
     >
-      <div className="shrink-0 flex items-center justify-between text-sm font-medium">
-        <span>{status.label}</span>
-        <span className="ml-2 bg-muted text-muted-foreground px-2 py-0.5 rounded-full text-xs">
+      <div className="shrink-0 flex items-center justify-between py-1">
+        <span className="text-md font-medium pt-1">{status.label}</span>
+        <span className="ml-2 px-2 py-0.5 rounded-full text-sm text-muted-foreground">
           {count}
         </span>
       </div>
 
       <ScrollArea className="min-h-0 -mr-3 pr-3 overflow-hidden grid">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 pb-2">
           <SortableContext
             items={columnTasks.map((t) => t.id)}
             strategy={verticalListSortingStrategy}
@@ -84,19 +114,52 @@ const TaskColumn = ({
               />
             ))}
           </SortableContext>
+          {isAdding && (
+            <Card className="p-4 border-0 bg-card shadow-md rounded-xl animate-in fade-in zoom-in duration-200">
+              <textarea
+                ref={inputRef}
+                placeholder="What needs to be done?"
+                className="
+                  w-full 
+                  bg-transparent 
+                  border-none 
+                  resize-none 
+                  text-sm 
+                  p-0 
+                  overflow-hidden 
+                  min-h-[40px] 
+                  placeholder:text-muted-foreground/50
+                  /* Hilangkan semua efek focus */
+                  focus:outline-none 
+                  focus:ring-0 
+                  focus-visible:ring-0 
+                  focus-visible:outline-none
+                "
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }}
+                onKeyDown={onKeyDown}
+                onBlur={() => {
+                  if (title.trim()) {
+                    handleCreateTask();
+                  } else {
+                    setIsAdding(false);
+                    setTitle("");
+                  }
+                }}
+              />
+            </Card>
+          )}
         </div>
       </ScrollArea>
 
       <Button
-        onClick={() => {
-          setModalState({
-            type: "add-task",
-            status: status.value,
-            boardId,
-          });
-        }}
+        onClick={() => setIsAdding(true)}
         variant="outline"
-        className="shrink-0 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer border-0 bg-transparent! hover:bg-transparent focus:ring-0 data-[state=open]:bg-transparent p-0! justify-start shadow-none"
+        className="shrink-0 flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer border-0 bg-transparent! hover:bg-transparent focus:ring-0 data-[state=open]:bg-transparent p-0! justify-start shadow-none h-auto"
       >
         <PlusIcon size={16} />
         Add New Task

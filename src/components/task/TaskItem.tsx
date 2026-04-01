@@ -1,17 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Task } from "@/types/task";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { OptionDropdown } from "../ui/option-dropdown";
-import { formatDueDate } from "@/lib/utils";
 import { ModalState } from "@/types/state";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Clock, TextAlignStart } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import Image from "next/image";
 
 type Props = {
   data: Task;
@@ -33,6 +29,8 @@ const TaskItem = ({
       id: data.id,
     });
 
+  const [loading, setLoading] = useState(true);
+
   const style = !isOverlay
     ? {
         transform: CSS.Transform.toString(transform),
@@ -41,54 +39,90 @@ const TaskItem = ({
       }
     : undefined;
 
+  const isMenuOpen =
+    modalState.type === "option-task" && modalState.taskId === data.id;
+
   return (
     <Card
-      className="p-4 cursor-pointer"
+      className="group relative cursor-pointer border-0 bg-card text-card-foreground rounded-xl shadow-sm transition-all overflow-hidden py-0 gap-0"
       ref={!isOverlay ? setNodeRef : undefined}
       style={style}
       {...(!isOverlay ? attributes : {})}
       {...(!isOverlay ? listeners : {})}
     >
-      <CardHeader className="p-0">
-        <CardAction>
-          <OptionDropdown
-            key={data.id}
-            open={
-              modalState.type === "option-task" && modalState.taskId === data.id
+      <div
+        className={`absolute top-3 right-3 z-20 transition-opacity duration-200 ${
+          isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        }`}
+      >
+        <OptionDropdown
+          key={data.id}
+          open={
+            modalState.type === "option-task" && modalState.taskId === data.id
+          }
+          onOpenChange={() => {
+            if (
+              modalState.type === "option-task" &&
+              modalState.taskId === data.id
+            ) {
+              setModalState({ type: null });
+            } else {
+              setModalState({ type: "option-task", taskId: data.id });
             }
-            onOpenChange={() => {
-              if (
-                modalState.type === "option-task" &&
-                modalState.taskId === data.id
-              ) {
-                setModalState({
-                  type: null,
-                });
-              } else {
-                setModalState({
-                  type: "option-task",
-                  taskId: data.id,
-                });
-              }
-            }}
-            onDelete={() => {
-              setModalState({
-                type: "delete-task",
-                taskId: data.id,
-              });
-            }}
-            onUpdate={() => {
-              setModalState({
-                type: "edit-task",
-                data: data,
-              });
-            }}
-            btnSize="xs"
-          />
-        </CardAction>
-        <CardTitle>{data?.title}</CardTitle>
-      </CardHeader>
-      <CardDescription>{formatDueDate(data?.dueDate)}</CardDescription>
+          }}
+          onDelete={() =>
+            setModalState({ type: "delete-task", taskId: data.id })
+          }
+          onUpdate={() => setModalState({ type: "edit-task", data: data })}
+          btnSize="xs"
+        />
+      </div>
+
+      {data.cover && (
+        <div className="w-full relative">
+          {data.cover.type === "color" && (
+            <div
+              className="w-full h-14"
+              style={{ backgroundColor: data.cover.value }}
+            />
+          )}
+
+          {data.cover.type === "image" && (
+            <div className="relative w-full h-32">
+              <Image
+                src={data.cover.value}
+                alt="Task Cover"
+                fill
+                className={`object-cover transition-opacity ${
+                  loading ? "opacity-0" : "opacity-100"
+                }`}
+                priority
+                onLoad={() => setLoading(false)}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="p-4 pt-3 flex flex-col gap-2.5">
+        <CardHeader className="p-0 gap-0">
+          <CardTitle className="font-medium text-sm leading-tight pr-6">
+            {data?.title}
+          </CardTitle>
+        </CardHeader>
+
+        {(data?.description || data?.dueDate) && (
+          <CardDescription className="text-xs flex items-center gap-1">
+            {data?.dueDate && (
+              <span className="flex flex-row gap-1 items-center">
+                <Clock className="h-3 w-3" />
+                {formatDate(data?.dueDate)}
+              </span>
+            )}
+            {data?.description && <TextAlignStart className="h-3 w-3" />}
+          </CardDescription>
+        )}
+      </div>
     </Card>
   );
 };

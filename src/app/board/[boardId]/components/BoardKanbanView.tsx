@@ -57,7 +57,7 @@ const BoardKanbanView = ({
       onDragOver={dnd.handleDragOver}
       onDragEnd={dnd.handleDragEnd}
     >
-      <div className="grid grid-cols-3 gap-4 items-start h-full overflow-hidden">
+      <div className="grid grid-flow-col auto-cols-[300px] gap-4 items-start h-full overflow-hidden overflow-x-auto">
         {TASK_STATUS.map((status) => {
           return (
             <TaskColumn
