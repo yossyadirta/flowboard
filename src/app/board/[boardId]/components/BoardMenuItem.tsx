@@ -61,7 +61,9 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
                 ref={textRef}
                 href={href}
                 className={`flex-1 min-w-0 truncate font-medium ${
-                  isActive ? "text-foreground" : "text-muted-foreground"
+                  isActive
+                    ? "font-semibold! text-foreground"
+                    : "text-muted-foreground"
                 }`}
               >
                 {item.name}
