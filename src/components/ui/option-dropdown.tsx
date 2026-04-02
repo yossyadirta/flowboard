@@ -37,7 +37,7 @@ export function OptionDropdown({
           <Button
             variant="outline"
             size={btnSize}
-            className={cn("cursor-pointer", btnClassName)}
+            className={cn("cursor-pointer border-0", btnClassName)}
           >
             <Ellipsis />
           </Button>
