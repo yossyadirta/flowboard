@@ -161,7 +161,7 @@ const BoardColumns = ({
             aria-label="Filter today"
             className="rounded-2xl cursor-pointer"
           >
-            today
+            Today
           </ToggleGroupItem>
           <ToggleGroupItem
             value="overdue"
