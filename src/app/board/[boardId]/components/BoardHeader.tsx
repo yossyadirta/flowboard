@@ -80,11 +80,15 @@ const BoardHeader = ({
             btnClassName="
               shadow-none 
               hover:bg-transparent
+              dark:hover:bg-transparent!
               focus:outline-none 
               focus:ring-0 
               focus-visible:outline-none 
               focus-visible:ring-0 
               data-[state=open]:bg-transparent
+              dark:data-[state=open]:bg-transparent!
+              bg-transparent!
+              dark:bg-transparent!
               border-0
               "
           />
