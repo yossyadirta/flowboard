@@ -13,9 +13,10 @@ import {
 import { TaskForm } from "./TaskForm";
 import { useTasks } from "@/hooks/useTasks";
 import { useState } from "react";
-import { Task, TaskStatus } from "@/types/task";
+import { Task } from "@/types/task";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
+import { TaskFormValues } from "@/schemas/task.schemas";
 
 type Props = {
   open: boolean;
@@ -32,20 +33,20 @@ export function EditTaskModal({ open, onClose, data }: Props) {
     title,
     status,
     dueDate,
-  }: {
-    title: string;
-    status: TaskStatus;
-    dueDate: Date;
-  }) => {
+    description,
+    cover,
+  }: TaskFormValues) => {
     if (!data?.boardId) return;
 
     const updatedTask = {
       ...data,
-      title: title,
-      status: status,
-      dueDate: dueDate,
+      title,
+      status,
+      dueDate,
+      description,
+      cover,
     };
-    updateTaskContent(updatedTask);
+    updateTaskContent(updatedTask as Task);
     onClose();
     toast.success("Task has been updated", {
       description: formatDate(new Date(), true),
@@ -58,7 +59,7 @@ export function EditTaskModal({ open, onClose, data }: Props) {
       <DialogOverlay className="fixed inset-0 bg-black/20 backdrop-blur-sm" />
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Edit Task</DialogTitle>
+          <DialogTitle className="sr-only">Edit Task</DialogTitle>
         </DialogHeader>
         <TaskForm
           onSubmit={handleSubmit}
@@ -67,6 +68,8 @@ export function EditTaskModal({ open, onClose, data }: Props) {
             status: data?.status,
             title: data?.title,
             dueDate: data?.dueDate,
+            description: data?.description,
+            cover: data?.cover,
           }}
         />
         <DialogFooter>
