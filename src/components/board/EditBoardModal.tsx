@@ -16,7 +16,7 @@ import { useState } from "react";
 import { BoardIconId } from "./BoardIcons";
 import { Board } from "@/types/board";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
+import { formatDueDate } from "@/lib/utils";
 
 type Props = {
   open: boolean;
@@ -42,7 +42,7 @@ export function EditBoardModal({ open, onClose, data }: Props) {
     updateBoard(board);
     onClose();
     toast.success("Board has been updated", {
-      description: formatDate(new Date(), true),
+      description: formatDueDate(new Date(), true),
       position: "top-center",
     });
   };

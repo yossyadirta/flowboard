@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDueDate } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import Image from "next/image";
@@ -152,7 +152,7 @@ export function TaskForm({ onSubmit, defaultValues, onValidityChange }: Props) {
 
                 <InputGroup>
                   <InputGroupInput
-                    value={value ? formatDate(value) : ""}
+                    value={value ? formatDueDate(value) : ""}
                     placeholder="No due date"
                     readOnly
                   />

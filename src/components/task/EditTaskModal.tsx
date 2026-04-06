@@ -15,7 +15,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { useState } from "react";
 import { Task } from "@/types/task";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
+import { formatDueDate } from "@/lib/utils";
 import { TaskFormValues } from "@/schemas/task.schemas";
 
 type Props = {
@@ -49,7 +49,7 @@ export function EditTaskModal({ open, onClose, data }: Props) {
     updateTaskContent(updatedTask as Task);
     onClose();
     toast.success("Task has been updated", {
-      description: formatDate(new Date(), true),
+      description: formatDueDate(new Date(), true),
       position: "top-center",
     });
   };

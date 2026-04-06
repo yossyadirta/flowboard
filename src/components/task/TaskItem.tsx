@@ -6,7 +6,7 @@ import { ModalState } from "@/types/state";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Clock, TextAlignStart } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDueDate } from "@/lib/utils";
 import Image from "next/image";
 
 type Props = {
@@ -116,7 +116,7 @@ const TaskItem = ({
             {data?.dueDate && (
               <span className="flex flex-row gap-1 items-center">
                 <Clock className="h-3 w-3" />
-                {formatDate(data?.dueDate)}
+                {formatDueDate(data?.dueDate)}
               </span>
             )}
             {data?.description && <TextAlignStart className="h-3 w-3" />}
