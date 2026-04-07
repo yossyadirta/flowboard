@@ -1,6 +1,6 @@
 "use client";
 
-import { Task, TaskStatus } from "@/types/task";
+import { Task, TaskCover, TaskStatus } from "@/types/task";
 import { useAppState } from "./useAppState";
 import { generateId } from "@/lib/id";
 import {
@@ -16,12 +16,21 @@ export const useTasks = () => {
   const tasks = state.tasks;
   const mappedTasks = Object.values(tasks);
 
-  const addTask = (
-    boardId: string,
-    title: string,
-    status: TaskStatus,
-    dueDate?: Date,
-  ) => {
+  const addTask = ({
+    boardId,
+    title,
+    status,
+    dueDate,
+    description,
+    cover,
+  }: {
+    boardId: string;
+    title: string;
+    status: TaskStatus;
+    dueDate?: Date;
+    description?: string;
+    cover?: TaskCover;
+  }) => {
     const sameColumnTasks = mappedTasks.filter(
       (task) => task.boardId === boardId && task.status === status,
     );
@@ -38,6 +47,8 @@ export const useTasks = () => {
       order: maxOrder + 1,
       createdAt: Date.now(),
       dueDate,
+      description,
+      cover,
     };
 
     dispatch({

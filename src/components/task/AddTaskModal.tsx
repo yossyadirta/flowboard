@@ -13,9 +13,9 @@ import {
 import { TaskForm } from "./TaskForm";
 import { useTasks } from "@/hooks/useTasks";
 import { useState } from "react";
-import { TaskStatus } from "@/types/task";
+import { TaskCover, TaskStatus } from "@/types/task";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
+import { formatDueDate } from "@/lib/utils";
 
 type Props = {
   open: boolean;
@@ -33,15 +33,27 @@ export function AddTaskModal({ open, onClose, status, boardId }: Props) {
     title,
     status,
     dueDate,
+    description,
+    cover,
   }: {
     title: string;
     status: TaskStatus;
-    dueDate: Date;
+    dueDate?: Date;
+    description?: string;
+    cover?: { type: "none" | "color" | "image"; value?: string };
   }) => {
-    addTask(boardId, title, status, dueDate);
+    const newTask = {
+      boardId,
+      title,
+      status,
+      dueDate,
+      description,
+      cover: cover as TaskCover | undefined,
+    };
+    addTask(newTask);
     onClose();
     toast.success("Task has been created", {
-      description: formatDate(new Date(), true),
+      description: formatDueDate(new Date(), true),
       position: "top-center",
     });
   };
@@ -51,7 +63,7 @@ export function AddTaskModal({ open, onClose, status, boardId }: Props) {
       <DialogOverlay className="fixed inset-0 bg-black/20 backdrop-blur-sm" />
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Add Task</DialogTitle>
+          <DialogTitle className="sr-only">Add Task</DialogTitle>
         </DialogHeader>
         <TaskForm
           onSubmit={handleSubmit}

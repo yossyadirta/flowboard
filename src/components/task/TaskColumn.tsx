@@ -55,7 +55,7 @@ const TaskColumn = ({
 
   const handleCreateTask = () => {
     if (title.trim()) {
-      addTask(boardId, title.trim(), status.value);
+      addTask({ boardId, title: title.trim(), status: status.value });
       setTitle("");
     }
     setIsAdding(false);
@@ -127,9 +127,8 @@ const TaskColumn = ({
                   text-sm 
                   p-0 
                   overflow-hidden 
-                  min-h-[40px] 
+                  min-h-10 
                   placeholder:text-muted-foreground/50
-                  /* Hilangkan semua efek focus */
                   focus:outline-none 
                   focus:ring-0 
                   focus-visible:ring-0 
