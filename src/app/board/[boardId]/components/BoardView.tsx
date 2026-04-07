@@ -4,7 +4,14 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { List, SearchIcon, SquareKanban, Table2, X } from "lucide-react";
+import {
+  List,
+  PlusIcon,
+  SearchIcon,
+  SquareKanban,
+  Table2,
+  X,
+} from "lucide-react";
 import {
   DragCancelEvent,
   DragEndEvent,
@@ -20,6 +27,7 @@ import BoardKanbanView from "./BoardKanbanView";
 import BoardTableView from "./BoardTableView";
 import BoardListView from "./BoardListView";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   derived: {
@@ -111,66 +119,77 @@ const BoardColumns = ({
           </TabsList>
         </Tabs>
       </div>
-      <div className="flex items-center gap-2">
-        <InputGroup className="w-full max-w-60">
-          <InputGroupInput
-            placeholder="Search..."
-            value={derived.search}
-            onChange={(e) => actions.setSearch(e.target.value)}
-            ref={inputRef}
-          />
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-2">
+          <InputGroup className="w-full max-w-60">
+            <InputGroupInput
+              placeholder="Search..."
+              value={derived.search}
+              onChange={(e) => actions.setSearch(e.target.value)}
+              ref={inputRef}
+            />
 
-          <InputGroupAddon>
-            <SearchIcon className="text-muted-foreground" />
-          </InputGroupAddon>
-
-          {derived.search && (
-            <InputGroupAddon align="inline-end">
-              <button
-                type="button"
-                onClick={() => {
-                  actions.setSearch("");
-                  inputRef.current?.focus();
-                }}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X size={16} />
-              </button>
+            <InputGroupAddon>
+              <SearchIcon className="text-muted-foreground" />
             </InputGroupAddon>
-          )}
-        </InputGroup>
-        <ToggleGroup
-          spacing={2}
-          type="single"
-          size="sm"
-          variant="outline"
-          value={derived.filter}
-          onValueChange={(value) => {
-            if (value) actions.setFilter(value);
-          }}
-        >
-          <ToggleGroupItem
-            value="all"
-            aria-label="Filter all"
-            className="rounded-2xl cursor-pointer"
+
+            {derived.search && (
+              <InputGroupAddon align="inline-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    actions.setSearch("");
+                    inputRef.current?.focus();
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
+          <ToggleGroup
+            spacing={2}
+            type="single"
+            size="sm"
+            variant="outline"
+            value={derived.filter}
+            onValueChange={(value) => {
+              if (value) actions.setFilter(value);
+            }}
           >
-            All
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="today"
-            aria-label="Filter today"
-            className="rounded-2xl cursor-pointer"
+            <ToggleGroupItem
+              value="all"
+              aria-label="Filter all"
+              className="rounded-lg cursor-pointer h-9 px-3.5"
+            >
+              All
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="today"
+              aria-label="Filter today"
+              className="rounded-lg cursor-pointer h-9 px-3.5"
+            >
+              Today
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="overdue"
+              aria-label="Filter overdue"
+              className="rounded-lg cursor-pointer h-9 px-3.5"
+            >
+              Overdue
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        {derived.view !== "kanban" && (
+          <Button
+            onClick={() => setModalState({ type: "add-task", boardId })}
+            className="cursor-pointer"
           >
-            Today
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="overdue"
-            aria-label="Filter overdue"
-            className="rounded-2xl cursor-pointer"
-          >
-            Overdue
-          </ToggleGroupItem>
-        </ToggleGroup>
+            <PlusIcon size={16} />
+            Add New Task
+          </Button>
+        )}
       </div>
       <div className="flex-1 overflow-hidden">
         {derived.view === "kanban" && (

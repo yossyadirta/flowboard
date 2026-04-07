@@ -2,7 +2,7 @@
 
 import { useBoards } from "@/hooks/useBoards";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
+import { formatDueDate } from "@/lib/utils";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 type Props = {
@@ -16,14 +16,16 @@ export const useBoardActions = ({ boardId }: Props) => {
 
   const { boards, deleteBoard, updateBoardFavorite } = useBoards();
 
-  const updateQuery = (key: string, value: string) => {
+  const updateQueries = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
 
     router.push(`${pathname}?${params.toString()}`);
   };
@@ -47,7 +49,7 @@ export const useBoardActions = ({ boardId }: Props) => {
       router.push("/board");
     }
     toast.success("Board has been deleted", {
-      description: formatDate(new Date(), true),
+      description: formatDueDate(new Date(), true),
       position: "top-center",
     });
   };
@@ -60,17 +62,28 @@ export const useBoardActions = ({ boardId }: Props) => {
     toast.success(
       `Board has been ${!isFavorite ? "added to" : "removed from"} favorites`,
       {
-        description: formatDate(new Date(), true),
+        description: formatDueDate(new Date(), true),
         position: "top-center",
       },
     );
   };
 
+  const setSearch = (value: string) => updateQueries({ search: value });
+
+  const setFilter = (value: string) => updateQueries({ filter: value });
+
+  const setView = (value: string) => {
+    updateQueries({
+      view: value,
+      search: "",
+      filter: "",
+    });
+  };
   return {
     handleDeleteBoard,
     onToggleFavorite,
-    setSearch: (value: string) => updateQuery("search", value),
-    setFilter: (value: string) => updateQuery("filter", value),
-    setView: (value: string) => updateQuery("view", value),
+    setSearch,
+    setFilter,
+    setView,
   };
 };
