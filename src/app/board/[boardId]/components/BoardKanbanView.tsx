@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { ModalState } from "@/types/state";
 import TaskItem from "@/components/task/TaskItem";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Props = {
   derived: {
@@ -57,33 +58,36 @@ const BoardKanbanView = ({
       onDragOver={dnd.handleDragOver}
       onDragEnd={dnd.handleDragEnd}
     >
-      <div className="grid grid-flow-col auto-cols-[300px] gap-4 items-start h-full overflow-hidden overflow-x-auto">
-        {TASK_STATUS.map((status) => {
-          return (
-            <TaskColumn
-              key={status.value}
-              status={status}
-              tasks={derived.visibleTasks}
-              setModalState={setModalState}
-              modalState={modalState}
-              boardId={boardId}
-              activeId={dnd.activeId}
-              derived={derived}
-            />
-          );
-        })}
-        <DragOverlay>
-          {dnd.activeId ? (
-            <TaskItem
-              data={tasks[dnd.activeId]}
-              isOverlay
-              modalState={modalState}
-              setModalState={setModalState}
-              activeId={null}
-            />
-          ) : null}
-        </DragOverlay>
-      </div>
+      <ScrollArea className="w-full h-full whitespace-nowrap [&>div>div]:block! [&>div>div]:h-full!">
+        <div className="grid grid-flow-col auto-cols-[300px] gap-4 items-start h-full w-max pb-4">
+          {TASK_STATUS.map((status) => {
+            return (
+              <TaskColumn
+                key={status.value}
+                status={status}
+                tasks={derived.visibleTasks}
+                setModalState={setModalState}
+                modalState={modalState}
+                boardId={boardId}
+                activeId={dnd.activeId}
+                derived={derived}
+              />
+            );
+          })}
+          <DragOverlay>
+            {dnd.activeId ? (
+              <TaskItem
+                data={tasks[dnd.activeId]}
+                isOverlay
+                modalState={modalState}
+                setModalState={setModalState}
+                activeId={null}
+              />
+            ) : null}
+          </DragOverlay>
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </DndContext>
   );
 };
