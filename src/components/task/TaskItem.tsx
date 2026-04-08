@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Task } from "@/types/task";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { OptionDropdown } from "../ui/option-dropdown";
@@ -8,6 +8,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { Clock, TextAlignStart } from "lucide-react";
 import { formatDueDate } from "@/lib/utils";
 import Image from "next/image";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { useIsOverflow } from "@/hooks/useIsOverflow";
 
 type Props = {
   data: Task;
@@ -30,6 +32,8 @@ const TaskItem = ({
     });
 
   const [loading, setLoading] = useState(true);
+  const textRef = useRef<HTMLDivElement>(null);
+  const isOverflow = useIsOverflow(textRef);
 
   const style = !isOverlay
     ? {
@@ -106,9 +110,20 @@ const TaskItem = ({
 
       <div className="p-4 pt-3 flex flex-col gap-2.5">
         <CardHeader className="p-0 gap-0">
-          <CardTitle className="font-medium text-sm leading-tight pr-6">
-            {data?.title}
-          </CardTitle>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CardTitle
+                className="flex-1 min-w-0 truncate font-medium text-sm leading-tight pr-6"
+                ref={textRef}
+              >
+                {data?.title}
+              </CardTitle>
+            </TooltipTrigger>
+
+            {isOverflow && (
+              <TooltipContent side="right">{data?.title}</TooltipContent>
+            )}
+          </Tooltip>
         </CardHeader>
 
         {(data?.description || data?.dueDate) && (
