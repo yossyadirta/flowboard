@@ -54,7 +54,8 @@ export const useBoardDerived = ({ boardId }: Props) => {
 
   const { emoji } = BOARD_ICONS_MAP[currentBoard?.icon ?? "briefcase"];
 
-  const isToday = (date: Date | string) => {
+  const isToday = (date: Date | string | undefined) => {
+    if (!date) return false;
     const d = new Date(date);
     const now = new Date();
 
@@ -65,7 +66,9 @@ export const useBoardDerived = ({ boardId }: Props) => {
     );
   };
 
-  const isOverdue = (date: Date | string) => {
+  const isOverdue = (date: Date | string | undefined) => {
+    if (!date) return false;
+
     const d = new Date(date);
     const now = new Date();
 
