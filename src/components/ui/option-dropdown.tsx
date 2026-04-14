@@ -33,7 +33,7 @@ export function OptionDropdown({
   return (
     <div onPointerDown={(e) => e.stopPropagation()}>
       <DropdownMenu open={open} onOpenChange={onOpenChange}>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="shadow-none">
           <Button
             variant="outline"
             size={btnSize}
