@@ -92,19 +92,6 @@ const BoardColumns = ({
             </TabsTrigger>
 
             <TabsTrigger
-              value="table"
-              className="flex items-center gap-2 cursor-pointer hover:foreground/80"
-            >
-              <Table2
-                className={cn(
-                  "h-6 w-6",
-                  derived.view === "table" ? "text-primary" : "",
-                )}
-              />
-              Table
-            </TabsTrigger>
-
-            <TabsTrigger
               value="list"
               className="flex items-center gap-2 cursor-pointer"
             >
@@ -115,6 +102,19 @@ const BoardColumns = ({
                 )}
               />
               List
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="table"
+              className="flex items-center gap-2 cursor-pointer hover:foreground/80"
+            >
+              <Table2
+                className={cn(
+                  "h-6 w-6",
+                  derived.view === "table" ? "text-primary" : "",
+                )}
+              />
+              Table
             </TabsTrigger>
           </TabsList>
         </Tabs>
