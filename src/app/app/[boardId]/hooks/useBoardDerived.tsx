@@ -19,7 +19,7 @@ export const useBoardDerived = ({ boardId }: Props) => {
   const search = searchParams.get("search") || "";
   const filter = searchParams.get("filter") || "all";
 
-  const allowedViews = ["kanban", "table", "list"] as const;
+  const allowedViews = ["kanban", "list", "table"] as const;
   type View = (typeof allowedViews)[number];
 
   const isValidView = (value: string | null): value is View => {
@@ -34,23 +34,6 @@ export const useBoardDerived = ({ boardId }: Props) => {
 
     return boards.find((item) => item.id === boardId) ?? null;
   }, [boardId, boards]);
-
-  const totalTask =
-    mappedTasks.filter((item) => item.boardId === boardId).length || 0;
-  const totalTodoTask =
-    mappedTasks.filter(
-      (item) => item.boardId === boardId && item.status === "todo",
-    ).length || 0;
-  const totalInprogressTask =
-    mappedTasks.filter(
-      (item) => item.boardId === boardId && item.status === "in-progress",
-    ).length || 0;
-  const totalDoneTask =
-    mappedTasks.filter(
-      (item) => item.boardId === boardId && item.status === "done",
-    ).length || 0;
-  const taskProgress =
-    totalTask === 0 ? 0 : Math.round((totalDoneTask / totalTask) * 100);
 
   const { emoji } = BOARD_ICONS_MAP[currentBoard?.icon ?? "briefcase"];
 
@@ -91,6 +74,29 @@ export const useBoardDerived = ({ boardId }: Props) => {
       return true;
     });
   }, [filter, search, mappedTasks, boardId]);
+
+  const totalTask =
+    mappedTasks.filter((item) => item.boardId === boardId).length || 0;
+  const totalTodoTask =
+    visibleTasks.filter(
+      (item) => item.boardId === boardId && item.status === "todo",
+    ).length || 0;
+  const totalInprogressTask =
+    visibleTasks.filter(
+      (item) => item.boardId === boardId && item.status === "in-progress",
+    ).length || 0;
+  const totalDoneTask =
+    visibleTasks.filter(
+      (item) => item.boardId === boardId && item.status === "done",
+    ).length || 0;
+  const taskProgress =
+    totalTask === 0
+      ? 0
+      : Math.round(
+          (mappedTasks.filter(
+            (item) => item.boardId === boardId && item.status === "done",
+          ).length || 0 / totalTask) * 100,
+        );
 
   return {
     visibleTasks,
