@@ -60,6 +60,7 @@ export function EditBoardModal({ open, onClose, data }: Props) {
           defaultValues={{
             name: data?.name ?? "",
             icon: data?.icon ?? "briefcase",
+            key: data?.key ?? "",
           }}
         />
         <DialogFooter>

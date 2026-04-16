@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { BoardForm } from "./BoardForm";
 import { useBoards } from "@/hooks/useBoards";
-import { generateId } from "@/lib/id";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BoardIconId } from "./BoardIcons";
@@ -32,14 +31,15 @@ export function AddBoardModal({ open, onClose }: Props) {
   const handleSubmit = ({
     name,
     icon,
+    key,
   }: {
     name: string;
     icon: BoardIconId;
+    key: string;
   }) => {
-    const id = generateId();
-    addBoard({ id, name, icon });
+    const id = addBoard({ key, name, icon });
     onClose();
-    router.push(`/board/${id}`);
+    router.push(`/app/${id}`);
   };
 
   return (

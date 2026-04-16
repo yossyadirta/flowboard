@@ -8,14 +8,29 @@ import {
   TOGGLE_FAVORITE_BOARD,
   UPDATE_BOARD,
 } from "@/state/actions";
+import { generateId } from "@/lib/id";
+import { BoardIconId } from "@/components/board/BoardIcons";
+
+type AddBoardPayload = {
+  name: string;
+  icon: BoardIconId;
+  key: string;
+};
 
 export const useBoards = () => {
   const { state, dispatch } = useAppState();
 
   const boards = Object.values(state.boards);
 
-  const addBoard = (board: Board) => {
-    board.createdAt = Date.now();
+  const addBoard = (data: AddBoardPayload) => {
+    const id = generateId();
+    const board: Board = {
+      id,
+      createdAt: Date.now(),
+      isFavorite: false,
+      taskCounter: 0,
+      ...data,
+    };
 
     dispatch({
       type: ADD_BOARD,
@@ -23,6 +38,8 @@ export const useBoards = () => {
         board,
       },
     });
+
+    return id;
   };
 
   const deleteBoard = (boardId: string) => {

@@ -42,6 +42,7 @@ export function BoardForm({
     defaultValues: {
       name: defaultValues?.name ?? "",
       icon: defaultValues?.icon ?? "briefcase",
+      key: defaultValues?.key ?? "",
     },
   });
 
@@ -53,6 +54,8 @@ export function BoardForm({
     control,
     name: "icon",
   });
+
+  const isEditMode = !!defaultValues?.key;
 
   return (
     <form
@@ -75,6 +78,37 @@ export function BoardForm({
                 placeholder="e.g. Default Board"
                 aria-invalid={fieldState.invalid}
               />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* KEY */}
+        <Controller
+          name="key"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="board-key">Board Key</FieldLabel>
+
+              <Input
+                {...field}
+                id="board-key"
+                placeholder="e.g. MKT"
+                disabled={isEditMode}
+                maxLength={5}
+                aria-invalid={fieldState.invalid}
+                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+              />
+
+              {/* Legend / Info text */}
+              <p className="text-[0.8rem] text-muted-foreground mt-1">
+                2-5 characters. Used as a prefix for tasks (e.g., MKT-1). <br />
+                <span className="font-medium text-foreground/80">
+                  Cannot be changed after creation.
+                </span>
+              </p>
 
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
