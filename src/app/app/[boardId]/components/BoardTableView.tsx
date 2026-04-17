@@ -72,6 +72,28 @@ export const BoardTableView = ({ tasks, setModalState }: Props) => {
   const columns: ColumnDef<Task>[] = useMemo(
     () => [
       {
+        accessorKey: "key",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4 cursor-pointer"
+            >
+              ID
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) => {
+          const key = row.getValue("key") as string;
+
+          return <span>{key}</span>;
+        },
+      },
+      {
         accessorKey: "title",
         header: ({ column }) => {
           return (
@@ -98,7 +120,7 @@ export const BoardTableView = ({ tasks, setModalState }: Props) => {
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
-              className="-ml-4"
+              className="-ml-4 cursor-pointer"
             >
               Status
               <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -135,7 +157,7 @@ export const BoardTableView = ({ tasks, setModalState }: Props) => {
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
-              className="-ml-4"
+              className="-ml-4 cursor-pointer"
             >
               Due Date
               <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -145,7 +167,9 @@ export const BoardTableView = ({ tasks, setModalState }: Props) => {
         cell: ({ row }) => {
           const date = row.getValue("dueDate") as string;
           return (
-            <span className="text-muted-foreground">{formatDueDate(date)}</span>
+            <span className="text-muted-foreground">
+              {date ? formatDueDate(date) : "-"}
+            </span>
           );
         },
       },
@@ -217,14 +241,7 @@ export const BoardTableView = ({ tasks, setModalState }: Props) => {
                   return (
                     <TableHead
                       key={header.id}
-                      className={cn(
-                        "whitespace-nowrap px-4",
-                        header.column.id === "title" && "w-[41.75%]",
-                        header.column.id === "dueDate" && "w-[32.25%]",
-                        header.column.id === "status" && "w-[20.75%]",
-                        header.column.id === "actions" &&
-                          "w-[6.25%] text-right cursor-pointer",
-                      )}
+                      className={cn("whitespace-nowrap px-4")}
                     >
                       {header.isPlaceholder
                         ? null
