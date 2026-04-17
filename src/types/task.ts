@@ -7,6 +7,7 @@ export type TaskCover =
 
 export type Task = {
   id: string;
+  key: string;
   title: string;
   status: TaskStatus;
   boardId: string;
