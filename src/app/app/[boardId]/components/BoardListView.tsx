@@ -6,17 +6,16 @@ import {
   ArrowUpDown,
   ImageIcon,
   MoreHorizontal,
-  Palette,
   Pencil,
   Trash2,
   CalendarIcon,
   CheckCircle2,
   Circle,
   Timer,
+  ChevronRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +37,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { formatDueDate } from "@/lib/utils";
+import { cn, formatDueDate } from "@/lib/utils";
 import { Task } from "@/types/task";
 import { TASK_STATUS } from "@/schemas/task.schemas";
 import { ModalState } from "@/types/state";
@@ -51,9 +50,15 @@ type Props = {
   boardId: string;
 };
 
-type SortOption = "dueDate-asc" | "dueDate-desc" | "title-asc" | "title-desc";
+type SortOption =
+  | "dueDate-asc"
+  | "dueDate-desc"
+  | "title-asc"
+  | "title-desc"
+  | "key-asc"
+  | "key-desc";
 
-export const BoardListView = ({ tasks, setModalState }: Props) => {
+export const BoardListView = ({ tasks, setModalState, boardId }: Props) => {
   const [sortOption, setSortOption] = useState<SortOption>("dueDate-asc");
 
   const groupedTasks = useMemo(() => {
@@ -63,59 +68,78 @@ export const BoardListView = ({ tasks, setModalState }: Props) => {
     });
 
     tasks.forEach((task) => {
-      if (groups[task.status]) {
-        groups[task.status].push(task);
-      } else {
-        if (!groups["UNCATEGORIZED"]) groups["UNCATEGORIZED"] = [];
-        groups["UNCATEGORIZED"].push(task);
-      }
+      if (groups[task.status]) groups[task.status].push(task);
     });
 
-    // 3. Sort each group based on the selected sortOption
     Object.keys(groups).forEach((key) => {
       groups[key].sort((a, b) => {
         if (sortOption.startsWith("dueDate")) {
           const dateA = new Date(a.dueDate || "9999-12-31").getTime();
           const dateB = new Date(b.dueDate || "9999-12-31").getTime();
           return sortOption.endsWith("asc") ? dateA - dateB : dateB - dateA;
-        } else if (sortOption.startsWith("title")) {
+        } else if (sortOption.startsWith("key")) {
+          const numA = parseInt(a.key?.split("-")[1] || "0");
+          const numB = parseInt(b.key?.split("-")[1] || "0");
+          return sortOption.endsWith("asc") ? numA - numB : numB - numA;
+        } else {
           return sortOption.endsWith("asc")
             ? a.title.localeCompare(b.title)
             : b.title.localeCompare(a.title);
         }
-        return 0;
       });
     });
 
     return groups;
   }, [tasks, sortOption]);
 
-  // Determine active accordion panels by default (open all if not too many, or just specific ones)
-  const defaultOpenGroups = Object.keys(groupedTasks).filter(
-    (key) => groupedTasks[key].length > 0,
-  );
+  const defaultOpenGroups = TASK_STATUS.map((s) => s.value);
 
-  const getStatusIcon = (statusValue: string) => {
-    if (statusValue === "DONE")
-      return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
-    if (statusValue === "DOING")
-      return <Timer className="h-4 w-4 text-blue-500" />;
-    return <Circle className="h-4 w-4 text-slate-400" />;
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "done":
+        return {
+          icon: <CheckCircle2 className="h-4 w-4" />,
+          color: "text-emerald-500",
+          bg: "bg-emerald-500/5",
+          border: "border-emerald-500/20",
+        };
+      case "in-progress":
+        return {
+          icon: <Timer className="h-4 w-4" />,
+          color: "text-blue-500",
+          bg: "bg-blue-500/5",
+          border: "border-blue-500/20",
+        };
+      default:
+        return {
+          icon: <Circle className="h-4 w-4" />,
+          color: "text-slate-400",
+          bg: "bg-slate-500/5",
+          border: "border-slate-500/20",
+        };
+    }
   };
 
   return (
-    <div className="flex-1 space-y-4 h-full flex flex-col">
-      {/* List Toolbar: Contains Sorting Action */}
-      <div className="flex items-center justify-end px-1">
+    // 1. Tambahkan overflow-hidden pada parent paling luar agar batasnya jelas
+    <div className="flex flex-col flex-1 h-full min-h-0 overflow-hidden">
+      {/* 2. Beri shrink-0 pada Toolbar agar tidak menyusut saat listnya panjang */}
+      <div className="flex items-center justify-end mb-4 shrink-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 shadow-sm">
-              <ArrowUpDown className="mr-2 h-4 w-4" />
-              Sort by
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs font-medium bg-background shadow-sm"
+            >
+              <ArrowUpDown className="mr-2 h-3.5 w-3.5" />
+              Sort
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>Due Date</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Due Date
+            </DropdownMenuLabel>
             <DropdownMenuItem onClick={() => setSortOption("dueDate-asc")}>
               Earliest First
               {sortOption === "dueDate-asc" && (
@@ -129,16 +153,18 @@ export const BoardListView = ({ tasks, setModalState }: Props) => {
               )}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel>Task Name</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setSortOption("title-asc")}>
-              A to Z
-              {sortOption === "title-asc" && (
+            <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Task ID
+            </DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setSortOption("key-asc")}>
+              Oldest (ID 1-9)
+              {sortOption === "key-asc" && (
                 <CheckCircle2 className="ml-auto h-4 w-4" />
               )}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortOption("title-desc")}>
-              Z to A
-              {sortOption === "title-desc" && (
+            <DropdownMenuItem onClick={() => setSortOption("key-desc")}>
+              Newest (ID 9-1)
+              {sortOption === "key-desc" && (
                 <CheckCircle2 className="ml-auto h-4 w-4" />
               )}
             </DropdownMenuItem>
@@ -146,65 +172,131 @@ export const BoardListView = ({ tasks, setModalState }: Props) => {
         </DropdownMenu>
       </div>
 
-      {/* List Content: Accordion Wrappers */}
-      <ScrollArea className="flex-1 -mx-4 px-4">
-        {tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
-            <p>No tasks found.</p>
-          </div>
-        ) : (
-          <Accordion
-            type="multiple"
-            defaultValue={defaultOpenGroups}
-            className="space-y-6 pb-10"
-          >
-            {TASK_STATUS.map((status) => {
-              const groupTasks = groupedTasks[status.value] || [];
+      {/* 3. BUNGKUS ScrollArea dengan div ini agar Flexbox merender height-nya secara mutlak */}
+      <div className="flex-1 min-h-0">
+        {/* Pastikan ScrollArea memiliki h-full */}
+        <ScrollArea className="h-full w-full">
+          <div className="pr-4 pb-10">
+            {tasks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground border-2 border-dashed rounded-xl">
+                <p className="text-sm font-medium">
+                  No tasks match your filter.
+                </p>
+              </div>
+            ) : (
+              <Accordion
+                type="multiple"
+                defaultValue={defaultOpenGroups}
+                className="space-y-4"
+              >
+                {TASK_STATUS.map((status) => {
+                  const groupTasks = groupedTasks[status.value] || [];
 
-              if (groupTasks.length === 0) return null; // Hide empty groups
+                  // Opsional: Jika kamu ingin tetap menampilkan status kosong agar user bisa add task di sana,
+                  // kamu bisa menghapus baris "if (groupTasks.length === 0) return null;"
+                  // Tapi jika ingin di-hide saat kosong, biarkan saja.
+                  if (groupTasks.length === 0) return null;
 
-              return (
-                <AccordionItem
-                  key={status.value}
-                  value={status.value}
-                  className="border-none"
-                >
-                  <AccordionTrigger className="hover:no-underline py-2 mb-2 rounded-md hover:bg-muted/50 px-2 transition-colors">
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(status.value)}
-                      <span className="font-semibold text-lg">
-                        {status.label}
-                      </span>
-                      <Badge
-                        variant="secondary"
-                        className="ml-2 rounded-full px-2.5"
+                  const config = getStatusConfig(status.value);
+
+                  return (
+                    <AccordionItem
+                      key={status.value}
+                      value={status.value}
+                      className="border-none"
+                    >
+                      <AccordionTrigger
+                        className={cn(
+                          "flex items-center justify-between py-1.5 px-3 rounded-lg hover:no-underline transition-all group",
+                          config.bg,
+                          config.border,
+                          "border shadow-sm",
+                        )}
                       >
-                        {groupTasks.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-0 pb-2">
-                    <div className="space-y-2">
-                      {groupTasks.map((task) => (
-                        <TaskListItem
-                          key={task.id}
-                          task={task}
-                          setModalState={setModalState}
-                        />
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
-        )}
-      </ScrollArea>
+                        {/* BAGIAN KIRI: Chevron, Icon, Status, Badge */}
+                        <div className="flex items-center gap-3">
+                          <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-90 shrink-0" />
+                          <div
+                            className={cn(
+                              "flex items-center gap-2 font-bold text-sm tracking-tight",
+                              config.color,
+                            )}
+                          >
+                            {config.icon}
+                            {status.label}
+                            <span className="ml-1 opacity-50 font-medium">
+                              ({groupTasks.length})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* BAGIAN KANAN: Tombol + Add Task (Selalu Terlihat di Kanan) */}
+                        {/* Hapus 'flex-1' atau margin yang tidak perlu agar dia menempel di kanan berkat justify-between di parent */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/50 border border-transparent hover:border-border shadow-sm transition-all"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setModalState({
+                              type: "add-task",
+                              status: status.value,
+                              boardId,
+                            });
+                          }}
+                        >
+                          <span className="mr-1.5 text-base leading-none font-light">
+                            +
+                          </span>
+                          Add Task
+                        </Button>
+                      </AccordionTrigger>
+
+                      <AccordionContent className="pt-3 pb-2 ml-7 border-l-2 border-muted/30 pl-4 space-y-2">
+                        {groupTasks.map((task) => (
+                          <TaskListItem
+                            key={task.id}
+                            task={task}
+                            setModalState={setModalState}
+                          />
+                        ))}
+
+                        <div className="pt-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg border border-transparent hover:border-border border-dashed transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setModalState({
+                                type: "add-task",
+                                status: status.value,
+                                boardId,
+                              });
+                            }}
+                          >
+                            <span className="flex items-center">
+                              <span className="text-xl leading-none mr-2 font-light mb-0.5">
+                                +
+                              </span>
+                              Add Task
+                            </span>
+                          </Button>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
+              </Accordion>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };
 
-// Sub-component for individual Task Row
 const TaskListItem = ({
   task,
   setModalState,
@@ -217,56 +309,50 @@ const TaskListItem = ({
 
   return (
     <div
-      className="group flex items-center justify-between p-3 px-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md hover:border-primary/20 transition-all cursor-pointer"
+      className={cn(
+        "group flex items-center justify-between p-3 rounded-xl border bg-card hover:bg-accent/5 transition-all cursor-pointer shadow-sm relative overflow-hidden",
+        task.cover?.type === "color" && "border-l-4",
+      )}
+      style={
+        task.cover?.type === "color"
+          ? { borderLeftColor: task.cover.value }
+          : {}
+      }
       onClick={() => setModalState({ type: "edit-task", data: task })}
     >
-      {/* Left side: Icons and Title */}
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        {/* Indicators for description/cover */}
-        <div className="flex items-center gap-1.5 text-muted-foreground w-10 shrink-0">
-          {task.cover && (
-            <div
-              title={
-                task.cover.type === "image" ? "Cover Image" : "Cover Color"
-              }
-            >
-              {task.cover.type === "image" ? (
-                <ImageIcon className="h-4 w-4" />
-              ) : (
-                <Palette className="h-4 w-4" />
-              )}
-            </div>
+        {/* Task Key */}
+        <span className="font-mono text-[10px] font-bold text-muted-foreground/60 shrink-0 tracking-tighter">
+          {task.key}
+        </span>
+
+        {/* Indicator Ikon */}
+        <div className="flex items-center gap-1.5 text-muted-foreground/40 shrink-0">
+          {task.cover?.type === "image" && (
+            <ImageIcon className="h-3.5 w-3.5" />
           )}
-          {task.description && (
-            <div title="Has description">
-              <AlignLeft className="h-4 w-4" />
-            </div>
-          )}
+          {task.description && <AlignLeft className="h-3.5 w-3.5" />}
         </div>
 
-        {/* Task Title with Tooltip if overflows */}
         <Tooltip>
           <TooltipTrigger asChild>
             <span
               ref={textRef}
-              className="truncate font-medium text-sm md:text-base"
+              className="truncate font-medium text-sm text-foreground/90"
             >
               {task.title}
             </span>
           </TooltipTrigger>
           {isOverflow && (
-            <TooltipContent side="top">
-              <p>{task.title}</p>
-            </TooltipContent>
+            <TooltipContent side="top">{task.title}</TooltipContent>
           )}
         </Tooltip>
       </div>
 
-      {/* Right side: Due Date and Actions */}
-      <div className="flex items-center gap-4 shrink-0 pl-4">
+      <div className="flex items-center gap-3 shrink-0 pl-4">
         {task.dueDate && (
-          <div className="flex items-center text-sm text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-md">
-            <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+          <div className="flex items-center text-[11px] font-medium text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full border">
+            <CalendarIcon className="mr-1.5 h-3 w-3" />
             {formatDueDate(task.dueDate)}
           </div>
         )}
@@ -275,10 +361,9 @@ const TaskListItem = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 data-[state=open]:opacity-100"
+              className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
             >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -288,14 +373,13 @@ const TaskListItem = ({
                 setModalState({ type: "edit-task", data: task });
               }}
             >
-              <Pencil className="mr-2 h-4 w-4" /> Edit Task
+              <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/50"
+              className="text-red-600 focus:text-red-600 focus:bg-red-50"
               onClick={(e) => {
                 e.stopPropagation();
-                console.log("Delete Task:", task.id);
-                // Execute delete logic here
+                console.log("Delete", task.id);
               }}
             >
               <Trash2 className="mr-2 h-4 w-4" /> Delete
