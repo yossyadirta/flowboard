@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useEffectEvent, useState } from "react";
+import React, { useEffect, useEffectEvent, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useTasks } from "@/hooks/useTasks";
+import { useBoards } from "@/hooks/useBoards";
 
 import { ModalState } from "@/types/state";
 import { useBoardActions } from "./hooks/useBoardActions";
@@ -14,7 +15,17 @@ import BoardModals from "./components/BoardModals";
 
 const Page = () => {
   const params = useParams<{ boardId: string }>();
-  const boardId = params.boardId;
+  const boardKey = params.boardId;
+
+  const { boards } = useBoards();
+
+  const currentBoard = useMemo(() => {
+    if (!boardKey) return null;
+
+    return boards.find((item) => item.key === boardKey) ?? null;
+  }, [boardKey, boards]);
+
+  const boardId = currentBoard?.id as string;
 
   const { tasks } = useTasks();
   const actions = useBoardActions({ boardId });

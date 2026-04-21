@@ -33,20 +33,20 @@ export const useBoardActions = ({ boardId }: Props) => {
   const getNextBoardId = () => {
     const index = boards.findIndex((item) => item.id === boardId);
     if (index === -1) return null;
-    if (boards[index + 1]) return boards[index + 1].id;
-    if (boards[index - 1]) return boards[index - 1].id;
+    if (boards[index + 1]) return boards[index + 1].key;
+    if (boards[index - 1]) return boards[index - 1].key;
 
     return null;
   };
 
   const handleDeleteBoard = () => {
-    const nextBoardId = getNextBoardId();
+    const nextBoardKey = getNextBoardId();
     deleteBoard(boardId);
 
-    if (nextBoardId) {
-      router.push(`/board/${nextBoardId}`);
+    if (nextBoardKey) {
+      router.push(`/app/${nextBoardKey}`);
     } else {
-      router.push("/board");
+      router.push("/app");
     }
     toast.success("Board has been deleted", {
       description: formatDueDate(new Date(), true),

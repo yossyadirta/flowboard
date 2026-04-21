@@ -37,9 +37,9 @@ export function AddBoardModal({ open, onClose }: Props) {
     icon: BoardIconId;
     key: string;
   }) => {
-    const id = addBoard({ key, name, icon });
+    const boardKey = addBoard({ key, name, icon });
     onClose();
-    router.push(`/app/${id}`);
+    router.push(`/app/${boardKey}`);
   };
 
   return (

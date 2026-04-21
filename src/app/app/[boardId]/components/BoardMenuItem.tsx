@@ -40,7 +40,7 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
 
   const closeModal = () => setModalState({ type: null });
 
-  const href = `/app/${item.id}`;
+  const href = `/app/${item.key}`;
   const isActive = pathname === href;
   const { emoji } = BOARD_ICONS_MAP[item?.icon ?? "briefcase"];
   const isOpen = modalState.type === "option-board";
