@@ -23,13 +23,15 @@ export const useBoards = () => {
   const boards = Object.values(state.boards);
 
   const addBoard = (data: AddBoardPayload) => {
+    const { key, ...rest } = data;
     const id = generateId();
     const board: Board = {
       id,
       createdAt: Date.now(),
       isFavorite: false,
       taskCounter: 0,
-      ...data,
+      key,
+      ...rest,
     };
 
     dispatch({
@@ -39,7 +41,7 @@ export const useBoards = () => {
       },
     });
 
-    return id;
+    return key;
   };
 
   const deleteBoard = (boardId: string) => {
