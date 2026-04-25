@@ -16,8 +16,13 @@ import {
   SidebarMenuItem,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clipboard, SearchIcon, SunMoon } from "lucide-react";
+import {
+  // Clipboard,
+  SearchIcon,
+  SunMoon,
+} from "lucide-react";
 import BoardMenuItem from "./[boardId]/components/BoardMenuItem";
 import {
   InputGroup,
@@ -58,7 +63,6 @@ export default function DashboardLayout({
     });
 
   const favoriteBoards = filteredBoards.filter((b) => b.isFavorite);
-  const otherBoards = filteredBoards.filter((b) => !b.isFavorite);
 
   const handleUpdateMounted = useEffectEvent(() => {
     setIsMounted(true);
@@ -80,23 +84,44 @@ export default function DashboardLayout({
             {/* RAIL MENU */}
             <div className="flex flex-col justify-between py-2 mr-0">
               <div className="w-16 flex flex-col items-center gap-4">
-                <Image src="/logo.svg" alt="Flowboard" width={32} height={32} />
-                <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
+                {/* <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center cursor-pointer">
+                  <Image
+                    src="/logo.svg"
+                    alt="Flowboard"
+                    width={32}
+                    height={32}
+                  />
+                </button> */}
+                <Link href="/app">
+                  <Image
+                    src="/logo.svg"
+                    alt="Flowboard"
+                    width={32}
+                    height={32}
+                  />
+                </Link>
+                {/* <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
                   <Clipboard
                     className="flex justify-center items-center text-center text-[0.5rem]"
                     size={21}
                   />
                   Boards
+                </button> */}
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center cursor-pointer"
+                >
+                  <SunMoon />
                 </button>
               </div>
-              <div className="w-16 flex flex-col items-center gap-4">
+              {/* <div className="w-16 flex flex-col items-center gap-4">
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   className="p-2 rounded-lg hover:bg-accent cursor-pointer"
                 >
                   <SunMoon />
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* SUB MENU */}
@@ -157,14 +182,23 @@ export default function DashboardLayout({
                   <SidebarGroup>
                     <SidebarGroupLabel>All Boards</SidebarGroupLabel>
                     <SidebarMenu>
-                      {otherBoards.length > 0 &&
-                        otherBoards.map((board) => (
+                      {filteredBoards.length > 0 ? (
+                        filteredBoards.map((board) => (
                           <BoardMenuItem
                             key={board.id}
                             item={board}
                             pathname={pathname}
                           />
-                        ))}
+                        ))
+                      ) : (
+                        <SidebarMenuItem>
+                          <SidebarMenuButton className="cursor-default hover:bg-transparent">
+                            <span className="flex-1 min-w-0 truncate text-muted-foreground">
+                              No boards yet
+                            </span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )}
                     </SidebarMenu>
                   </SidebarGroup>
                 </SidebarContent>
