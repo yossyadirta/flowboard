@@ -121,9 +121,7 @@ export const BoardListView = ({ tasks, setModalState, boardId }: Props) => {
   };
 
   return (
-    // 1. Tambahkan overflow-hidden pada parent paling luar agar batasnya jelas
     <div className="flex flex-col flex-1 h-full min-h-0 overflow-hidden">
-      {/* 2. Beri shrink-0 pada Toolbar agar tidak menyusut saat listnya panjang */}
       <div className="flex items-center justify-end mb-4 shrink-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -172,9 +170,7 @@ export const BoardListView = ({ tasks, setModalState, boardId }: Props) => {
         </DropdownMenu>
       </div>
 
-      {/* 3. BUNGKUS ScrollArea dengan div ini agar Flexbox merender height-nya secara mutlak */}
       <div className="flex-1 min-h-0">
-        {/* Pastikan ScrollArea memiliki h-full */}
         <ScrollArea className="h-full w-full">
           <div className="pr-4 pb-10">
             {tasks.length === 0 ? (
@@ -213,7 +209,6 @@ export const BoardListView = ({ tasks, setModalState, boardId }: Props) => {
                           "border shadow-sm",
                         )}
                       >
-                        {/* BAGIAN KIRI: Chevron, Icon, Status, Badge */}
                         <div className="flex items-center gap-3">
                           <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-90 shrink-0" />
                           <div
@@ -230,8 +225,6 @@ export const BoardListView = ({ tasks, setModalState, boardId }: Props) => {
                           </div>
                         </div>
 
-                        {/* BAGIAN KANAN: Tombol + Add Task (Selalu Terlihat di Kanan) */}
-                        {/* Hapus 'flex-1' atau margin yang tidak perlu agar dia menempel di kanan berkat justify-between di parent */}
                         <Button
                           variant="ghost"
                           size="sm"
@@ -321,12 +314,10 @@ const TaskListItem = ({
       onClick={() => setModalState({ type: "edit-task", data: task })}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        {/* Task Key */}
         <span className="font-mono text-[10px] font-bold text-muted-foreground/60 shrink-0 tracking-tighter">
           {task.key}
         </span>
 
-        {/* Indicator Ikon */}
         <div className="flex items-center gap-1.5 text-muted-foreground/40 shrink-0">
           {task.cover?.type === "image" && (
             <ImageIcon className="h-3.5 w-3.5" />

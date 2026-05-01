@@ -64,7 +64,6 @@ export function BoardForm({
       className="flex flex-col gap-4"
     >
       <FieldGroup>
-        {/* NAME */}
         <Controller
           name="name"
           control={control}
@@ -84,7 +83,6 @@ export function BoardForm({
           )}
         />
 
-        {/* KEY */}
         <Controller
           name="key"
           control={control}
@@ -102,7 +100,6 @@ export function BoardForm({
                 onChange={(e) => field.onChange(e.target.value.toUpperCase())}
               />
 
-              {/* Legend / Info text */}
               <p className="text-[0.8rem] text-muted-foreground mt-1">
                 2-5 characters. Used as a prefix for tasks (e.g., MKT-1). <br />
                 <span className="font-medium text-foreground/80">
@@ -115,7 +112,6 @@ export function BoardForm({
           )}
         />
 
-        {/* ICON */}
         <Field>
           <FieldLabel>Icon</FieldLabel>
 
