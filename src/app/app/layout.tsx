@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Clipboard,
   // Clipboard,
   SearchIcon,
   SunMoon,
@@ -84,44 +85,40 @@ export default function DashboardLayout({
             {/* RAIL MENU */}
             <div className="flex flex-col justify-between py-2 mr-0">
               <div className="w-16 flex flex-col items-center gap-4">
-                {/* <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center cursor-pointer">
-                  <Image
-                    src="/logo.svg"
-                    alt="Flowboard"
-                    width={32}
-                    height={32}
-                  />
-                </button> */}
                 <Link href="/app">
-                  <Image
-                    src="/logo.svg"
-                    alt="Flowboard"
-                    width={32}
-                    height={32}
-                  />
+                  <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center cursor-pointer">
+                    <Image
+                      src="/logo.svg"
+                      alt="Flowboard"
+                      width={32}
+                      height={32}
+                    />
+                  </button>
                 </Link>
-                {/* <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
-                  <Clipboard
-                    className="flex justify-center items-center text-center text-[0.5rem]"
-                    size={21}
-                  />
-                  Boards
-                </button> */}
-                <button
+                <Link href="/app">
+                  <button className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
+                    <Clipboard
+                      className="flex justify-center items-center text-center text-[0.5rem]"
+                      size={21}
+                    />
+                    Boards
+                  </button>
+                </Link>
+                {/* <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center cursor-pointer"
                 >
                   <SunMoon />
-                </button>
+                </button> */}
               </div>
-              {/* <div className="w-16 flex flex-col items-center gap-4">
+              <div className="w-16 flex flex-col items-center gap-4">
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   className="p-2 rounded-lg hover:bg-accent cursor-pointer"
                 >
                   <SunMoon />
                 </button>
-              </div> */}
+              </div>
             </div>
 
             {/* SUB MENU */}
@@ -157,28 +154,21 @@ export default function DashboardLayout({
               {/* BOARD LIST */}
               <ScrollArea className="flex-1 min-h-0 [&>div>div]:block!">
                 <SidebarContent>
-                  <SidebarGroup>
-                    <SidebarGroupLabel>Favorites</SidebarGroupLabel>
-                    <SidebarMenu>
-                      {favoriteBoards?.length > 0 ? (
-                        favoriteBoards.map((board) => (
+                  {favoriteBoards?.length > 0 && (
+                    <SidebarGroup>
+                      <SidebarGroupLabel>Favorites</SidebarGroupLabel>
+                      <SidebarMenu>
+                        {favoriteBoards.map((board) => (
                           <BoardMenuItem
                             item={board}
                             pathname={pathname}
                             key={board.id}
+                            isFavoriteSection
                           />
-                        ))
-                      ) : (
-                        <SidebarMenuItem>
-                          <SidebarMenuButton className="cursor-default hover:bg-transparent">
-                            <span className="flex-1 min-w-0 truncate text-muted-foreground">
-                              No favorite boards yet
-                            </span>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      )}
-                    </SidebarMenu>
-                  </SidebarGroup>
+                        ))}
+                      </SidebarMenu>
+                    </SidebarGroup>
+                  )}
                   <SidebarGroup>
                     <SidebarGroupLabel>All Boards</SidebarGroupLabel>
                     <SidebarMenu>
