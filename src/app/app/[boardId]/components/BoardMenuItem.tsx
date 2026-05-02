@@ -24,9 +24,9 @@ import BoardModals from "./BoardModals";
 import { ModalState } from "@/types/state";
 import { cn } from "@/lib/utils";
 
-type Props = { item: Board; pathname: string };
+type Props = { item: Board; pathname: string; isFavoriteSection?: boolean };
 
-const BoardMenuItem = ({ item, pathname }: Props) => {
+const BoardMenuItem = ({ item, pathname, isFavoriteSection }: Props) => {
   const textRef = useRef<HTMLAnchorElement>(null);
   const isOverflow = useIsOverflow(textRef);
 
@@ -41,7 +41,7 @@ const BoardMenuItem = ({ item, pathname }: Props) => {
   const closeModal = () => setModalState({ type: null });
 
   const href = `/app/${item.key}`;
-  const isActive = pathname === href;
+  const isActive = pathname === href && (isFavoriteSection || !item.isFavorite);
   const { emoji } = BOARD_ICONS_MAP[item?.icon ?? "briefcase"];
   const isOpen = modalState.type === "option-board";
 
