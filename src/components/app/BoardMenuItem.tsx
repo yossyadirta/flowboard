@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { BOARD_ICONS_MAP } from "@/components/board/BoardIcons";
+import { BOARD_ICONS_MAP } from "@/components/app/board/BoardIcons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   SidebarMenuAction,
@@ -17,9 +17,9 @@ import { useIsOverflow } from "@/hooks/useIsOverflow";
 import { Board } from "@/types/board";
 import Link from "next/link";
 import { OptionDropdown } from "@/components/ui/option-dropdown";
-import { useBoardActions } from "../hooks/useBoardActions";
-import { useBoardDnd } from "../hooks/useBoardDnd";
-import { useBoardDerived } from "../hooks/useBoardDerived";
+import { useBoardActions } from "@/hooks/app/useBoardActions";
+import { useBoardDnd } from "@/hooks/app/useBoardDnd";
+import { useBoardDerived } from "@/hooks/app/useBoardDerived";
 import BoardModals from "./BoardModals";
 import { ModalState } from "@/types/state";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,10 @@ const BoardMenuItem = ({ item, pathname, isFavoriteSection }: Props) => {
 
   const href = `/app/${item.key}`;
   const isActive = pathname === href && (isFavoriteSection || !item.isFavorite);
-  const { emoji } = BOARD_ICONS_MAP[item?.icon ?? "briefcase"];
+  const { emoji } =
+    BOARD_ICONS_MAP[
+      (item?.icon ?? "briefcase") as keyof typeof BOARD_ICONS_MAP
+    ];
   const isOpen = modalState.type === "option-board";
 
   return (

@@ -6,12 +6,12 @@ import { useTasks } from "@/hooks/useTasks";
 import { useBoards } from "@/hooks/useBoards";
 
 import { ModalState } from "@/types/state";
-import { useBoardActions } from "./hooks/useBoardActions";
-import { useBoardDnd } from "./hooks/useBoardDnd";
-import { useBoardDerived } from "./hooks/useBoardDerived";
-import BoardHeader from "./components/BoardHeader";
-import BoardView from "./components/BoardView";
-import BoardModals from "./components/BoardModals";
+import { useBoardActions } from "@/hooks/app/useBoardActions";
+import { useBoardDnd } from "@/hooks/app/useBoardDnd";
+import { useBoardDerived } from "@/hooks/app/useBoardDerived";
+import BoardHeader from "@/components/app/BoardHeader";
+import BoardView from "@/components/app/BoardView";
+import BoardModals from "@/components/app/BoardModals";
 
 const Page = () => {
   const params = useParams<{ boardId: string }>();

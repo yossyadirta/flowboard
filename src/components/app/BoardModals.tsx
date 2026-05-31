@@ -1,8 +1,8 @@
 import React from "react";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
-import { EditBoardModal } from "@/components/board/EditBoardModal";
-import { AddTaskModal } from "@/components/task/AddTaskModal";
-import { EditTaskModal } from "@/components/task/EditTaskModal";
+import { EditBoardModal } from "@/components/app/board/EditBoardModal";
+import { AddTaskModal } from "@/components/app/task/AddTaskModal";
+import { EditTaskModal } from "@/components/app/task/EditTaskModal";
 import { ModalState } from "@/types/state";
 import { Board } from "@/types/board";
 

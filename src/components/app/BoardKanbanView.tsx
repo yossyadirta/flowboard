@@ -2,7 +2,7 @@ import React from "react";
 import { TASK_STATUS } from "@/schemas/task.schemas";
 import { Board } from "@/types/board";
 import { Task } from "@/types/task";
-import TaskColumn from "@/components/task/TaskColumn";
+import TaskColumn from "@/components/app/task/TaskColumn";
 import {
   DndContext,
   DragCancelEvent,
@@ -13,7 +13,7 @@ import {
   closestCorners,
 } from "@dnd-kit/core";
 import { ModalState } from "@/types/state";
-import TaskItem from "@/components/task/TaskItem";
+import TaskItem from "@/components/app/task/TaskItem";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Props = {

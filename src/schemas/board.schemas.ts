@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BOARD_ICON_IDS } from "@/components/board/BoardIcons";
+import { BOARD_ICON_IDS } from "@/components/app/board/BoardIcons";
 
 export const boardSchema = z.object({
   name: z.string().min(1, "Board name is required"),

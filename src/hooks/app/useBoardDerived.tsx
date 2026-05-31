@@ -1,6 +1,6 @@
 "use client";
 
-import { BOARD_ICONS_MAP } from "@/components/board/BoardIcons";
+import { BOARD_ICONS_MAP } from "@/components/app/board/BoardIcons";
 import { useBoards } from "@/hooks/useBoards";
 import { useTasks } from "@/hooks/useTasks";
 import { useMemo } from "react";
@@ -35,7 +35,10 @@ export const useBoardDerived = ({ boardId }: Props) => {
     return boards.find((item) => item.id === boardId) ?? null;
   }, [boardId, boards]);
 
-  const { emoji } = BOARD_ICONS_MAP[currentBoard?.icon ?? "briefcase"];
+  const { emoji } =
+    BOARD_ICONS_MAP[
+      (currentBoard?.icon ?? "briefcase") as keyof typeof BOARD_ICONS_MAP
+    ];
 
   const isToday = (date: Date | string | undefined) => {
     if (!date) return false;

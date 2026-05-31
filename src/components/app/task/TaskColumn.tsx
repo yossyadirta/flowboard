@@ -1,6 +1,6 @@
 import { ModalState } from "@/types/state";
 import { Task, TaskStatus } from "@/types/task";
-import { Card } from "../ui/card";
+import { Card } from "@/components/ui/card";
 import TaskItem from "./TaskItem";
 import { PlusIcon } from "lucide-react";
 import {
@@ -8,8 +8,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
-import { ScrollArea } from "../ui/scroll-area";
-import { Button } from "../ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
 import { useEffect, useRef, useState } from "react";
 

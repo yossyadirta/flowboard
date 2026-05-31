@@ -1,14 +1,23 @@
 import React, { useRef, useState } from "react";
 import { Task } from "@/types/task";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { OptionDropdown } from "../ui/option-dropdown";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { OptionDropdown } from "@/components/ui/option-dropdown";
 import { ModalState } from "@/types/state";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Clock, TextAlignStart } from "lucide-react";
 import { formatDueDate } from "@/lib/utils";
 import Image from "next/image";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useIsOverflow } from "@/hooks/useIsOverflow";
 
 type Props = {

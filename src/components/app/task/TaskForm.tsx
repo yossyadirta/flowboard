@@ -30,11 +30,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "../ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { formatDueDate } from "@/lib/utils";
-import { Textarea } from "../ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Image from "next/image";
 
 const COLORS = [

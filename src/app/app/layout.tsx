@@ -4,7 +4,7 @@ import React, { useEffect, useEffectEvent, useState } from "react";
 import { useBoards } from "@/hooks/useBoards";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { AddBoardModal } from "@/components/board/AddBoardModal";
+import { AddBoardModal } from "@/components/app/board/AddBoardModal";
 import {
   SidebarProvider,
   Sidebar,
@@ -18,13 +18,8 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Clipboard,
-  // Clipboard,
-  SearchIcon,
-  SunMoon,
-} from "lucide-react";
-import BoardMenuItem from "./[boardId]/components/BoardMenuItem";
+import { Clipboard, SearchIcon, SunMoon } from "lucide-react";
+import BoardMenuItem from "@/components/app/BoardMenuItem";
 import {
   InputGroup,
   InputGroupAddon,
