@@ -6,10 +6,8 @@ export const boardSchema = z.object({
   icon: z.enum(BOARD_ICON_IDS),
   key: z
     .string()
-    .max(5, "Board key must be at most 5 characters")
-    .refine((val) => !val || val.length >= 2, {
-      message: "key must be at least 2 characters",
-    }),
+    .min(3, "Board key must be at least 3 characters")
+    .max(5, "Board key must be at most 5 characters"),
 });
 
 export type BoardFormValues = z.infer<typeof boardSchema>;
