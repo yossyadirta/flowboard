@@ -51,7 +51,7 @@ export const RecentActivitiesCard = ({
             </p>
           </div>
         ) : (
-          <ScrollArea className="h-75 xl:h-full px-4 md:px-6 pb-6">
+          <ScrollArea className="h-auto xl:h-full px-4 md:px-6 pb-6">
             <div className="space-y-5 relative before:absolute before:inset-0 before:ml-4 md:before:ml-4 before:-translate-x-px md:before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-linear-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-800 before:to-transparent mt-2">
               {recentTasks.map((task) => (
                 <RecentActivityItem key={`act-${task.id}`} task={task} />

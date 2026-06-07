@@ -66,7 +66,7 @@ export default function HomeDashboard() {
 
   return (
     <>
-      <div className="flex flex-col gap-6 w-full min-h-screen xl:h-screen xl:overflow-hidden bg-slate-50/50 dark:bg-background/95 p-5 pl-0 xs:pl-5">
+      <div className="flex flex-col gap-6 w-full h-full overflow-y-auto xl:overflow-hidden bg-slate-50/50 dark:bg-background/95 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
@@ -85,7 +85,7 @@ export default function HomeDashboard() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 flex-1 xl:min-h-0 pb-10 xl:pb-4 overflow-y-auto xl:overflow-hidden overflow-x-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 flex-1 xl:min-h-0 pb-10 xl:pb-4">
           <div className="xl:col-span-2 flex flex-col gap-6 xl:h-full xl:min-h-0">
             <section className="shrink-0">
               <div className="flex items-center justify-between mb-4">

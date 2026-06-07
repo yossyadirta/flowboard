@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarGroupLabel,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -191,8 +192,17 @@ export default function DashboardLayout({
             </div>
           </div>
         </Sidebar>
-        <SidebarInset className="h-screen overflow-hidden p-4 flex-1">
-          {children}
+        <SidebarInset className="h-screen overflow-hidden flex flex-col flex-1">
+          <header className="flex h-14 shrink-0 items-center justify-between border-b px-4 md:hidden">
+            <Link href="/app" className="flex items-center gap-2">
+              <Image src="/logo.svg" alt="Flowboard" width={28} height={28} />
+              <span className="font-bold text-lg">Flowboard</span>
+            </Link>
+            <SidebarTrigger />
+          </header>
+          <div className="flex-1 overflow-hidden">
+            {children}
+          </div>
         </SidebarInset>
       </SidebarProvider>
 

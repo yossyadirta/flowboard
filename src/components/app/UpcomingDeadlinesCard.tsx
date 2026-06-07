@@ -38,7 +38,7 @@ export function UpcomingDeadlinesCard({
             </p>
           </div>
         ) : (
-          <ScrollArea className="h-62.5 xl:h-full">
+          <ScrollArea className="h-auto xl:h-full">
             <div className="flex flex-col">
               {upcomingTasks.map((task) => (
                 <div

@@ -31,7 +31,7 @@ export function ProjectStatusList({
         <h2 className="text-lg md:text-xl font-semibold">Project Status</h2>
       </div>
 
-      <ScrollArea className="max-h-100 xl:max-h-none xl:h-full pr-4 -mr-4">
+      <ScrollArea className="h-auto xl:max-h-none xl:h-full pr-4 -mr-4">
         <div className="flex flex-col gap-3 pb-12 md:pb-0 sm:pb-0 xs:pb-0">
           {boards.map((board) => {
             const metrics = getBoardMetrics(board.id);
@@ -61,11 +61,10 @@ export function ProjectStatusList({
                   </div>
                   <Badge
                     variant="secondary"
-                    className={`text-[10px] md:text-xs shrink-0 ${
-                      isCompleted
+                    className={`text-[10px] md:text-xs shrink-0 ${isCompleted
                         ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
                         : "bg-slate-100 dark:bg-slate-800"
-                    }`}
+                      }`}
                   >
                     {isCompleted ? "Completed" : "In Progress"}
                   </Badge>
@@ -81,9 +80,8 @@ export function ProjectStatusList({
                   </div>
                   <Progress
                     value={metrics.progress}
-                    className={`h-1.5 md:h-2 ${
-                      isCompleted ? "[&>div]:bg-emerald-500" : ""
-                    }`}
+                    className={`h-1.5 md:h-2 ${isCompleted ? "[&>div]:bg-emerald-500" : ""
+                      }`}
                   />
                 </div>
               </div>
