@@ -53,7 +53,7 @@ export const Navbar = () => {
         </a>
       </div>
       <Button asChild size="sm" className="gap-1.5">
-        <Link href="/app">
+        <Link href="/app" target="_blank" rel="noopener noreferrer">
           Launch App
           <ArrowRight className="size-3.5" />
         </Link>

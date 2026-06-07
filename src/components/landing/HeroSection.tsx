@@ -101,7 +101,7 @@ export const HeroSection = () => {
             size="lg"
             className="gap-2 px-8 text-sm shadow-lg shadow-primary/20"
           >
-            <Link href="/app">
+            <Link href="/app" target="_blank" rel="noopener noreferrer">
               Get Started
               <ArrowRight className="size-4" />
             </Link>

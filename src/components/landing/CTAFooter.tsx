@@ -42,7 +42,7 @@ export const CTAFooter = () => {
               size="lg"
               className="group gap-2 px-10 py-6 text-base shadow-lg shadow-primary/20"
             >
-              <Link href="/app">
+              <Link href="/app" target="_blank" rel="noopener noreferrer">
                 Open Flowboard — It&apos;s Free
                 <motion.span
                   className="inline-block"
