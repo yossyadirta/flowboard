@@ -1,4 +1,4 @@
-import { BoardIconId } from "@/components/board/BoardIcons";
+import { BoardIconId } from "@/components/app/board/BoardIcons";
 
 export type Board = {
   id: string;
