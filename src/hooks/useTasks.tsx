@@ -65,9 +65,16 @@ export const useTasks = () => {
       },
     });
 
-    updateBoard({
-      ...board,
-      taskCounter: newCounter,
+    // Use direct dispatch to update the board synchronously
+    // without triggering the skeleton loader delay from useBoards.updateBoard
+    dispatch({
+      type: "UPDATE_BOARD" as any,
+      payload: {
+        board: {
+          ...board,
+          taskCounter: newCounter,
+        },
+      },
     });
   };
 

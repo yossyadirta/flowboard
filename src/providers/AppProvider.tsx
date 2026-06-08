@@ -13,7 +13,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? { ...base, ...JSON.parse(raw) } : base;
+      return raw ? { ...base, ...JSON.parse(raw), isFetching: true, isMutating: false } : { ...base, isFetching: true, isMutating: false };
     } catch {
       return base;
     }
@@ -22,6 +22,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    // Simulate initial fetching latency to display the skeleton loader
+    const timer = setTimeout(() => {
+      dispatch({ type: "SET_FETCHING", payload: false } as any);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

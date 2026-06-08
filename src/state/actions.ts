@@ -11,6 +11,9 @@ export const DELETE_TASK = "DELETE_TASK";
 export const UPDATE_TASK_CONTENT = "UPDATE_TASK_CONTENT";
 export const UPDATE_TASK_DRAG_AND_DROP = "UPDATE_TASK_DRAG_AND_DROP";
 
+export const SET_MUTATING = "SET_MUTATING";
+export const SET_FETCHING = "SET_FETCHING";
+
 /* =========================
   BOARD ACTIONS
 ========================= */
@@ -74,6 +77,19 @@ export type UpdateTaskDragAndDropAction = {
 };
 
 /* =========================
+  LOADING ACTIONS
+========================= */
+export type SetMutatingAction = {
+  type: typeof SET_MUTATING;
+  payload: boolean;
+};
+
+export type SetFetchingAction = {
+  type: typeof SET_FETCHING;
+  payload: boolean;
+};
+
+/* =========================
   UNION ACTION
 ========================= */
 export type Action =
@@ -84,4 +100,6 @@ export type Action =
   | AddTaskAction
   | UpdateTaskContentAction
   | DeleteTaskAction
-  | UpdateTaskDragAndDropAction;
+  | UpdateTaskDragAndDropAction
+  | SetMutatingAction
+  | SetFetchingAction;

@@ -4,6 +4,8 @@ import { Task, TaskStatus } from "./task";
 export type AppState = {
   boards: Record<string, Board>;
   tasks: Record<string, Task>;
+  isMutating: boolean;
+  isFetching: boolean;
 };
 
 export type ModalState =
