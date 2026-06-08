@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { KanbanSkeleton, ListSkeleton, TableSkeleton } from "./skeletons/BoardSkeletons";
+import { useAppState } from "@/hooks/useAppState";
 import {
   InputGroup,
   InputGroupAddon,
@@ -72,6 +74,7 @@ const BoardColumns = ({
   actions,
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { state } = useAppState();
 
   return (
     <div className="flex flex-col gap-4 overflow-hidden">
@@ -192,33 +195,43 @@ const BoardColumns = ({
         )}
       </div>
       <div className="flex-1 overflow-hidden">
-        {derived.view === "kanban" && (
-          <BoardKanbanView
-            dnd={dnd}
-            derived={derived}
-            tasks={tasks}
-            modalState={modalState}
-            setModalState={setModalState}
-            boardId={boardId}
-          />
-        )}
+        {state.isFetching || state.isMutating ? (
+          <>
+            {derived.view === "kanban" && <KanbanSkeleton />}
+            {derived.view === "table" && <TableSkeleton />}
+            {derived.view === "list" && <ListSkeleton />}
+          </>
+        ) : (
+          <>
+            {derived.view === "kanban" && (
+              <BoardKanbanView
+                dnd={dnd}
+                derived={derived}
+                tasks={tasks}
+                modalState={modalState}
+                setModalState={setModalState}
+                boardId={boardId}
+              />
+            )}
 
-        {derived.view === "table" && (
-          <BoardTableView
-            tasks={derived.visibleTasks}
-            modalState={modalState}
-            setModalState={setModalState}
-            boardId={boardId}
-          />
-        )}
+            {derived.view === "table" && (
+              <BoardTableView
+                tasks={derived.visibleTasks}
+                modalState={modalState}
+                setModalState={setModalState}
+                boardId={boardId}
+              />
+            )}
 
-        {derived.view === "list" && (
-          <BoardListView
-            tasks={derived.visibleTasks}
-            modalState={modalState}
-            setModalState={setModalState}
-            boardId={boardId}
-          />
+            {derived.view === "list" && (
+              <BoardListView
+                tasks={derived.visibleTasks}
+                modalState={modalState}
+                setModalState={setModalState}
+                boardId={boardId}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
