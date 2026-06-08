@@ -25,14 +25,17 @@ import {
 import { useRouter } from "next/navigation";
 import { AddBoardModal } from "@/components/app/board/AddBoardModal";
 import { useBoardDashboardData } from "@/hooks/app/useBoardDashboardData";
+import { useAppState } from "@/hooks/useAppState";
 import { EmptyState } from "@/components/app/EmptyStateDashboard";
 import { RecentActivitiesCard } from "@/components/app/RecentActivityCard";
 import { ProjectStatusList } from "@/components/app/ProjectStatusList";
 import { UpcomingDeadlinesCard } from "@/components/app/UpcomingDeadlinesCard";
 import { Board } from "@/types/board";
+import { DashboardSkeleton } from "@/components/app/skeletons/DashboardSkeleton";
 
 export default function HomeDashboard() {
   const router = useRouter();
+  const { state } = useAppState();
 
   const {
     boards,
@@ -51,6 +54,10 @@ export default function HomeDashboard() {
     getBoardMetrics,
     getBoardName,
   } = useBoardDashboardData();
+
+  if (state.isFetching || state.isMutating) {
+    return <DashboardSkeleton />;
+  }
 
   if (!hasBoards) {
     return (
