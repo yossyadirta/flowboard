@@ -45,12 +45,9 @@ export const FeaturesSection = () => {
                   <div
                     className="group relative h-full overflow-hidden rounded-xl border border-border/50 bg-card p-6 transition-all hover:shadow-lg hover:shadow-black/5 hover:border-primary/50"
                   >
-                    <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                      <div className="absolute -top-20 -right-20 size-40 rounded-full bg-primary/10 blur-3xl" />
-                    </div>
                     <div className="relative z-10">
                       <div
-                        className="mb-4 inline-flex rounded-lg border border-border/50 bg-background/50 p-2.5 backdrop-blur-sm group-hover:border-primary/30 group-hover:text-primary transition-colors"
+                        className="mb-4 inline-flex rounded-lg border border-border/50 bg-background/50 p-2.5 group-hover:border-primary/30 group-hover:text-primary transition-colors"
                       >
                         <Icon className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>

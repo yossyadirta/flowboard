@@ -18,9 +18,6 @@ export const TechSection = () => {
 
   return (
     <Section id="tech" className="relative">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[150px]" />
-      </div>
       <div ref={ref} className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -56,7 +53,7 @@ export const TechSection = () => {
                 stiffness: 300,
                 damping: 20,
               }}
-              className="flex items-center gap-2 rounded-full border border-border/50 bg-card/50 px-4 py-2 backdrop-blur-sm"
+              className="flex items-center gap-2 rounded-full border border-border/50 bg-card/50 px-4 py-2"
             >
               <span className="text-sm font-medium">{tech.name}</span>
               <span className="text-xs text-muted-foreground">

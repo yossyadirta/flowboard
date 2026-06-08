@@ -17,7 +17,17 @@ import { DEMO_TASKS, getStatusConfig, getStatusLabel } from "./constants";
 
 export const DemoSection = () => {
   const [view, setView] = useState<"kanban" | "list" | "table">("kanban");
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const handleSetView = (newView: "kanban" | "list" | "table") => {
+    if (newView === view) return;
+    setIsDemoLoading(true);
+    setTimeout(() => {
+      setView(newView);
+      setIsDemoLoading(false);
+    }, 500);
+  };
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const grouped = {
@@ -66,7 +76,7 @@ export const DemoSection = () => {
               return (
                 <button
                   key={tab.key}
-                  onClick={() => setView(tab.key)}
+                  onClick={() => handleSetView(tab.key)}
                   className={`relative flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${isActive
                     ? "text-foreground cursor-default"
                     : "text-muted-foreground hover:text-foreground cursor-pointer"
@@ -97,7 +107,7 @@ export const DemoSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="rounded-xl border border-border/50 bg-card/40 p-1 shadow-xl backdrop-blur-sm"
+          className="rounded-xl border border-border/50 bg-card/80 p-1 shadow-xl"
         >
           <div className="rounded-lg border border-border/30 bg-card p-4">
             <div className="mb-4 flex items-center justify-between border-b border-border/30 pb-3">
@@ -132,7 +142,28 @@ export const DemoSection = () => {
             </div>
 
             <AnimatePresence mode="wait">
-              {view === "kanban" && (
+              {isDemoLoading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-96 flex items-center justify-center p-4"
+                >
+                  <div className="w-full h-full flex flex-col gap-4 animate-in fade-in duration-300">
+                    <div className="flex gap-4">
+                      <div className="h-4 w-1/4 bg-muted/50 rounded animate-pulse" />
+                      <div className="h-4 w-1/4 bg-muted/50 rounded animate-pulse" />
+                      <div className="h-4 w-1/4 bg-muted/50 rounded animate-pulse" />
+                    </div>
+                    <div className="flex gap-4 flex-1">
+                      <div className="flex-1 bg-muted/30 rounded-lg animate-pulse" />
+                      <div className="flex-1 bg-muted/30 rounded-lg animate-pulse" />
+                      <div className="flex-1 bg-muted/30 rounded-lg animate-pulse" />
+                    </div>
+                  </div>
+                </motion.div>
+              ) : view === "kanban" ? (
                 <motion.div
                   key="kanban"
                   initial={{ opacity: 0, y: 8 }}
@@ -152,7 +183,7 @@ export const DemoSection = () => {
                     return (
                       <Card
                         key={col.status}
-                        className="border-0 bg-secondary/60 p-3 flex flex-col gap-2"
+                        className="border-0 bg-secondary p-3 flex flex-col gap-2"
                       >
                         <div className="flex items-center justify-between py-1">
                           <span className="text-xs font-medium">
@@ -198,9 +229,7 @@ export const DemoSection = () => {
                     );
                   })}
                 </motion.div>
-              )}
-
-              {view === "list" && (
+              ) : view === "list" ? (
                 <motion.div
                   key="list"
                   initial={{ opacity: 0, y: 8 }}
@@ -274,9 +303,7 @@ export const DemoSection = () => {
                     );
                   })}
                 </motion.div>
-              )}
-
-              {view === "table" && (
+              ) : view === "table" ? (
                 <motion.div
                   key="table"
                   initial={{ opacity: 0, y: 8 }}
@@ -332,7 +359,7 @@ export const DemoSection = () => {
                     </tbody>
                   </table>
                 </motion.div>
-              )}
+              ) : null}
             </AnimatePresence>
           </div>
         </motion.div>

@@ -13,10 +13,6 @@ export const CTAFooter = () => {
 
   return (
     <Section className="relative">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/4 size-[400px] rounded-full bg-primary/5 blur-[100px]" />
-        <div className="absolute right-1/4 bottom-0 size-[300px] rounded-full bg-primary/10 blur-[80px]" />
-      </div>
       <div ref={ref} className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

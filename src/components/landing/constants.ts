@@ -54,24 +54,7 @@ export const DEMO_TASKS = [
     description: "Use tanstack/react-table",
     cover: null,
   },
-  {
-    id: "t6",
-    key: "FB-6",
-    title: "Write onboarding flow",
-    status: "todo" as const,
-    dueDate: "Jun 15",
-    description: "",
-    cover: null,
-  },
-  {
-    id: "t7",
-    key: "FB-7",
-    title: "Dashboard metrics cards",
-    status: "todo" as const,
-    dueDate: "",
-    description: "Progress bars and analytics",
-    cover: { type: "color" as const, value: "#F59E0B" },
-  },
+
 ];
 
 export const FEATURES = [

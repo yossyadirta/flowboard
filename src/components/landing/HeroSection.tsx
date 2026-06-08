@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import {
   ArrowRight,
-  Sparkles,
   Clipboard,
   SearchIcon,
   Star,
@@ -18,35 +17,190 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useMouseParallax } from "@/hooks/useMouseParallax";
 import { HERO_WORDS, DEMO_TASKS, wordVariants, fadeUp } from "./constants";
 import { Section } from "./Section";
 
-export const HeroSection = () => {
-  const { mouseX, mouseY } = useMouseParallax();
+const GRID_GAP = 40;
+const DOT_RADIUS = 1.5;
+const COLS = 42;
+const ROWS = 24;
+const INFLUENCE_RADIUS = 120;
 
-  const orb1X = useTransform(mouseX, [-0.5, 0.5], [-40, 40]);
-  const orb1Y = useTransform(mouseY, [-0.5, 0.5], [-30, 30]);
-  const orb2X = useTransform(mouseX, [-0.5, 0.5], [30, -30]);
-  const orb2Y = useTransform(mouseY, [-0.5, 0.5], [20, -20]);
-  const orb3X = useTransform(mouseX, [-0.5, 0.5], [-20, 20]);
-  const orb3Y = useTransform(mouseY, [-0.5, 0.5], [-40, 40]);
+const ParticleField = ({
+  cursorX,
+  cursorY,
+}: {
+  cursorX: ReturnType<typeof useMotionValue<number>>;
+  cursorY: ReturnType<typeof useMotionValue<number>>;
+}) => {
+  const dots = useMemo(() => {
+    const result: { cx: number; cy: number; idx: number }[] = [];
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        result.push({
+          cx: col * GRID_GAP + GRID_GAP / 2,
+          cy: row * GRID_GAP + GRID_GAP / 2,
+          idx: row * COLS + col,
+        });
+      }
+    }
+    return result;
+  }, []);
+
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox={`0 0 ${COLS * GRID_GAP} ${ROWS * GRID_GAP}`}
+      preserveAspectRatio="xMidYMid slice"
+    >
+      {dots.map((dot) => (
+        <Dot
+          key={dot.idx}
+          cx={dot.cx}
+          cy={dot.cy}
+          idx={dot.idx}
+          cursorX={cursorX}
+          cursorY={cursorY}
+        />
+      ))}
+    </svg>
+  );
+};
+
+const Dot = React.memo(
+  ({
+    cx,
+    cy,
+    idx,
+    cursorX,
+    cursorY,
+  }: {
+    cx: number;
+    cy: number;
+    idx: number;
+    cursorX: ReturnType<typeof useMotionValue<number>>;
+    cursorY: ReturnType<typeof useMotionValue<number>>;
+  }) => {
+    const svgWidth = COLS * GRID_GAP;
+    const svgHeight = ROWS * GRID_GAP;
+
+    const dist = useTransform(
+      [cursorX, cursorY],
+      ([mx, my]: number[]) => {
+        if (mx < 0 && my < 0) return 999;
+        const dotScreenX = (cx / svgWidth) * mx * 2 - mx + (cx / svgWidth) * mx * 2;
+        const dotScreenY = (cy / svgHeight) * my * 2 - my + (cy / svgHeight) * my * 2;
+        const dx = mx - (cx / svgWidth) * (mx + window.innerWidth) + window.innerWidth / 2 - cx * (window.innerWidth / svgWidth - 1);
+        const dy = my - (cy / svgHeight) * (my + window.innerHeight) + window.innerHeight / 2 - cy * (window.innerHeight / svgHeight - 1);
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+    );
+
+    const proximity = useTransform(dist, [0, INFLUENCE_RADIUS * 3], [1, 0]);
+    const scale = useTransform(proximity, [0, 1], [1, 2.2]);
+    const opacity = useTransform(proximity, [0, 1], [0.06, 0.35]);
+
+    const breatheDelay = (idx % 7) * 0.8 + (idx % 3) * 1.2;
+
+    return (
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={DOT_RADIUS}
+        className="fill-primary"
+        style={{
+          scale,
+          opacity,
+          transformOrigin: `${cx}px ${cy}px`,
+        }}
+        animate={{
+          opacity: [0.04, 0.1, 0.04],
+        }}
+        transition={{
+          duration: 4 + (idx % 3),
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: breatheDelay,
+        }}
+      />
+    );
+  }
+);
+Dot.displayName = "Dot";
+
+const FloatingCard = ({
+  children,
+  className,
+  floatY = [-6, 6],
+  floatRotate = [0.5, -0.5],
+  duration = 7,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  floatY?: [number, number];
+  floatRotate?: [number, number];
+  duration?: number;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        y: [floatY[0], floatY[1], floatY[0]],
+        rotate: [floatRotate[0], floatRotate[1], floatRotate[0]],
+      }}
+      transition={{
+        opacity: { duration: 0.5, delay: 0.8 + delay },
+        scale: { duration: 0.5, delay: 0.8 + delay, type: "spring" },
+        y: { duration, repeat: Infinity, ease: "easeInOut", delay: 0.8 + delay },
+        rotate: { duration, repeat: Infinity, ease: "easeInOut", delay: 0.8 + delay },
+      }}
+      whileHover={{
+        scale: 1.05,
+        y: floatY[0] - 8,
+        transition: {
+          type: "spring",
+          stiffness: 300,
+          damping: 20,
+        },
+      }}
+      className={`cursor-default rounded-lg border border-border/50 bg-card/80 p-3 shadow-xl transition-colors duration-300 hover:border-primary/50 hover:shadow-primary/10 ${className ?? ""}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+export const HeroSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cursorX = useMotionValue(-1);
+  const cursorY = useMotionValue(-1);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
+    },
+    [cursorX, cursorY]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    cursorX.set(-1);
+    cursorY.set(-1);
+  }, [cursorX, cursorY]);
 
   return (
     <Section className="relative min-h-screen pt-32">
-      <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          style={{ x: orb1X, y: orb1Y }}
-          className="absolute -top-20 -left-20 size-[500px] rounded-full bg-primary/10 blur-[120px]"
-        />
-        <motion.div
-          style={{ x: orb2X, y: orb2Y }}
-          className="absolute top-1/3 -right-32 size-[400px] rounded-full bg-primary/10 blur-[100px]"
-        />
-        <motion.div
-          style={{ x: orb3X, y: orb3Y }}
-          className="absolute -bottom-20 left-1/3 size-[350px] rounded-full bg-primary/10 blur-[80px]"
-        />
+      <div
+        ref={containerRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="pointer-events-auto absolute inset-0 overflow-hidden"
+      >
+        <ParticleField cursorX={cursorX} cursorY={cursorY} />
       </div>
 
       <div
@@ -67,11 +221,7 @@ export const HeroSection = () => {
               variants={wordVariants}
               initial="hidden"
               animate="visible"
-              className={
-                word === "Flow,"
-                  ? "text-primary"
-                  : ""
-              }
+              className={word === "Flow," ? "text-primary" : ""}
             >
               {word}
             </motion.span>
@@ -114,7 +264,12 @@ export const HeroSection = () => {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="rounded-xl border border-border/50 bg-card/60 p-1 shadow-2xl shadow-black/10 backdrop-blur-sm"
+            whileHover={{
+              scale: 1.02,
+              y: -10,
+              transition: { type: "spring", stiffness: 300, damping: 20 },
+            }}
+            className="rounded-xl border border-border/50 bg-card/60 p-1 shadow-2xl shadow-black/10 transition-colors duration-300 hover:border-primary/50 hover:shadow-primary/10"
           >
             <div className="rounded-lg border border-border/30 bg-card overflow-hidden">
               <div className="flex items-center gap-2 border-b border-border/30 bg-muted/30 px-4 py-2.5">
@@ -129,10 +284,9 @@ export const HeroSection = () => {
                   </span>
                 </div>
               </div>
-
               <div className="flex" style={{ height: 340 }}>
-                <div className="hidden w-72 shrink-0 border-r border-border/30 bg-secondary/50 md:flex">
-                  <div className="flex w-14 shrink-0 flex-col items-center gap-3 border-r border-border/20 py-3">
+                <div className="hidden w-72 shrink-0 bg-secondary/30 p-1.5 md:flex">
+                  <div className="flex w-14 shrink-0 flex-col items-center gap-3 py-1.5 pr-1.5">
                     <motion.div
                       animate={{ y: [0, -3, 0] }}
                       transition={{
@@ -149,22 +303,23 @@ export const HeroSection = () => {
                       />
                     </motion.div>
                     <div className="flex flex-col items-center gap-2 mt-1">
-                      <div className="flex size-9 items-center justify-center rounded-lg bg-background">
+                      <div className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
                         <Clipboard className="size-4 text-foreground/70" />
+                        Boards
                       </div>
                     </div>
                   </div>
-                  <div className="flex-1 p-3 overflow-hidden">
-                    <div className="flex h-8 items-center rounded-md bg-background/60 px-2.5 mb-3">
+                  <div className="flex-1 p-3 overflow-hidden bg-background rounded-lg border border-border/30 shadow-sm">
+                    <div className="flex h-8 items-center rounded-md bg-secondary/50 px-2.5 mb-3 border border-border/30">
                       <SearchIcon className="size-3.5 text-muted-foreground mr-2" />
                       <span className="text-[11px] text-muted-foreground">
                         Search boards...
                       </span>
                     </div>
-                    <div className="text-[10px] text-muted-foreground mb-2 px-1 font-medium">
+                    <div className="text-[10px] text-start text-muted-foreground mb-2 px-1 font-medium">
                       + Add Board
                     </div>
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 mb-2 px-1 mt-3">
+                    <div className="text-[9px] text-start tracking-wider text-muted-foreground/60 mb-2 px-1 mt-3">
                       Favorites
                     </div>
                     {[
@@ -174,15 +329,15 @@ export const HeroSection = () => {
                       <div
                         key={b.name}
                         className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] mb-0.5 ${b.active
-                          ? "bg-background font-medium"
-                          : "text-muted-foreground"
+                          ? "bg-secondary font-medium text-foreground"
+                          : "text-muted-foreground hover:bg-secondary/50"
                           }`}
                       >
                         <span>{b.emoji}</span>
                         <span className="truncate">{b.name}</span>
                       </div>
                     ))}
-                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground/60 mb-2 px-1 mt-3">
+                    <div className="text-[9px] text-start tracking-wider text-muted-foreground/60 mb-2 px-1 mt-3">
                       All Boards
                     </div>
                     {[
@@ -192,7 +347,7 @@ export const HeroSection = () => {
                     ].map((b) => (
                       <div
                         key={b.name}
-                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] text-muted-foreground mb-0.5"
+                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] text-muted-foreground mb-0.5 hover:bg-secondary/50"
                       >
                         <span>{b.emoji}</span>
                         <span className="truncate">{b.name}</span>
@@ -201,7 +356,7 @@ export const HeroSection = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden p-4">
+                <div className="flex-1 overflow-hidden p-4 bg-background">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <div className="flex size-7 items-center justify-center rounded-md bg-secondary text-sm">
@@ -227,7 +382,23 @@ export const HeroSection = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2.5 h-[calc(100%-80px)]">
+                  <div className="flex gap-2 mb-3">
+                    <div className="flex h-7 w-48 items-center rounded-md border border-border/50 bg-secondary/30 px-2.5">
+                      <SearchIcon className="size-3 text-muted-foreground mr-1.5" />
+                      <span className="text-[10px] text-muted-foreground">Filter tasks...</span>
+                    </div>
+                    <div className="flex h-7 items-center justify-center rounded-md border border-border/50 bg-secondary/30 px-2.5 text-[10px] text-muted-foreground font-medium">
+                      All
+                    </div>
+                    <div className="flex h-7 items-center justify-center rounded-md border border-border/50 bg-secondary/30 px-2.5 text-[10px] text-muted-foreground font-medium">
+                      Today
+                    </div>
+                    <div className="flex h-7 items-center justify-center rounded-md border border-border/50 bg-secondary/30 px-2.5 text-[10px] text-muted-foreground font-medium">
+                      Overdue
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5 h-[calc(100%-120px)]">
                     {(
                       [
                         { status: "todo", label: "To do" },
@@ -241,10 +412,10 @@ export const HeroSection = () => {
                       return (
                         <div
                           key={col.status}
-                          className="rounded-lg bg-secondary/60 p-2 flex flex-col overflow-hidden"
+                          className="rounded-lg bg-secondary p-2 flex flex-col overflow-hidden"
                         >
                           <div className="flex items-center justify-between px-1 mb-2">
-                            <span className="text-[11px] font-medium">
+                            <span className="text-[11px] font-medium text-start">
                               {col.label}
                             </span>
                             <span className="text-[10px] text-muted-foreground">
@@ -253,40 +424,29 @@ export const HeroSection = () => {
                           </div>
                           <div className="flex-1 flex flex-col gap-1.5 overflow-hidden">
                             {tasks.map((task, taskIdx) => (
-                              <motion.div
-                                key={task.id}
-                                animate={{ y: [0, -4 - taskIdx, 0] }}
-                                transition={{
-                                  duration: 3 + colIdx * 0.5,
-                                  repeat: Infinity,
-                                  ease: "easeInOut",
-                                  delay: colIdx * 0.7 + taskIdx * 0.3,
-                                }}
-                              >
-                                <Card className="border-0 bg-card shadow-sm rounded-lg py-0 gap-0 overflow-hidden">
-                                  {task.cover && (
-                                    <div
-                                      className="w-full h-3"
-                                      style={{
-                                        backgroundColor: task.cover.value,
-                                      }}
-                                    />
+                              <Card key={task.id} className="border-0 bg-card shadow-sm rounded-lg py-0 gap-0 overflow-hidden">
+                                {task.cover && (
+                                  <div
+                                    className="w-full h-3 max-h-3"
+                                    style={{
+                                      backgroundColor: task.cover.value,
+                                    }}
+                                  />
+                                )}
+                                <div className="p-2.5 pt-2">
+                                  <CardHeader className="p-0 gap-0">
+                                    <CardTitle className="text-[11px] font-medium leading-tight truncate text-start">
+                                      {task.title}
+                                    </CardTitle>
+                                  </CardHeader>
+                                  {task.dueDate && (
+                                    <CardDescription className="text-[9px] flex items-center gap-1 mt-1.5">
+                                      <Clock className="size-2.5" />
+                                      {task.dueDate}
+                                    </CardDescription>
                                   )}
-                                  <div className="p-2.5 pt-2">
-                                    <CardHeader className="p-0 gap-0">
-                                      <CardTitle className="text-[11px] font-medium leading-tight truncate">
-                                        {task.title}
-                                      </CardTitle>
-                                    </CardHeader>
-                                    {task.dueDate && (
-                                      <CardDescription className="text-[9px] flex items-center gap-1 mt-1.5">
-                                        <Clock className="size-2.5" />
-                                        {task.dueDate}
-                                      </CardDescription>
-                                    )}
-                                  </div>
-                                </Card>
-                              </motion.div>
+                                </div>
+                              </Card>
                             ))}
                             <div className="flex items-center gap-1 text-[10px] text-muted-foreground/60 px-1 mt-auto pt-1">
                               <PlusIcon className="size-3" />
@@ -302,14 +462,12 @@ export const HeroSection = () => {
             </div>
           </motion.div>
 
-          <motion.div
-            animate={{ y: [0, -12, 0], rotate: [1, 2, 1] }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute -right-4 -bottom-6 hidden rounded-lg border border-border/50 bg-card/80 p-3 shadow-xl backdrop-blur-sm md:block"
+          <FloatingCard
+            className="absolute -right-4 -bottom-6 hidden md:block"
+            floatY={[-5, 5]}
+            floatRotate={[0.5, 1.5]}
+            duration={7}
+            delay={0}
           >
             <div className="flex items-center gap-2 text-xs">
               <BarChart3 className="size-4 text-primary" />
@@ -330,17 +488,14 @@ export const HeroSection = () => {
                 />
               ))}
             </div>
-          </motion.div>
+          </FloatingCard>
 
-          <motion.div
-            animate={{ y: [0, -10, 0], rotate: [-1, -2, -1] }}
-            transition={{
-              duration: 4.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5,
-            }}
-            className="absolute -bottom-4 -left-4 hidden rounded-lg border border-border/50 bg-card/80 p-3 shadow-xl backdrop-blur-sm md:block"
+          <FloatingCard
+            className="absolute -bottom-4 -left-4 hidden md:block"
+            floatY={[-4, 6]}
+            floatRotate={[-0.5, -1.5]}
+            duration={8}
+            delay={0.8}
           >
             <div className="flex items-center gap-2 text-xs">
               <CheckCircle2 className="size-4 text-primary" />
@@ -354,7 +509,7 @@ export const HeroSection = () => {
                 className="h-full rounded-full bg-primary"
               />
             </div>
-          </motion.div>
+          </FloatingCard>
         </div>
       </div>
     </Section>
