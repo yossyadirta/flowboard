@@ -34,6 +34,7 @@ export const boardReducer = (state: AppState, action: Action): AppState => {
       );
 
       return {
+        ...state,
         boards: newBoards,
         tasks: newTasks,
       };
