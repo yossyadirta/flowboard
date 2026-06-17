@@ -29,9 +29,13 @@ const INFLUENCE_RADIUS = 120;
 const ParticleField = ({
   cursorX,
   cursorY,
+  elWidth,
+  elHeight,
 }: {
   cursorX: ReturnType<typeof useMotionValue<number>>;
   cursorY: ReturnType<typeof useMotionValue<number>>;
+  elWidth: number;
+  elHeight: number;
 }) => {
   const dots = useMemo(() => {
     const result: { cx: number; cy: number; idx: number }[] = [];
@@ -61,6 +65,8 @@ const ParticleField = ({
           idx={dot.idx}
           cursorX={cursorX}
           cursorY={cursorY}
+          elWidth={elWidth}
+          elHeight={elHeight}
         />
       ))}
     </svg>
@@ -74,12 +80,16 @@ const Dot = React.memo(
     idx,
     cursorX,
     cursorY,
+    elWidth,
+    elHeight,
   }: {
     cx: number;
     cy: number;
     idx: number;
     cursorX: ReturnType<typeof useMotionValue<number>>;
     cursorY: ReturnType<typeof useMotionValue<number>>;
+    elWidth: number;
+    elHeight: number;
   }) => {
     const svgWidth = COLS * GRID_GAP;
     const svgHeight = ROWS * GRID_GAP;
@@ -88,10 +98,10 @@ const Dot = React.memo(
       [cursorX, cursorY],
       ([mx, my]: number[]) => {
         if (mx < 0 && my < 0) return 999;
-        const dotScreenX = (cx / svgWidth) * mx * 2 - mx + (cx / svgWidth) * mx * 2;
-        const dotScreenY = (cy / svgHeight) * my * 2 - my + (cy / svgHeight) * my * 2;
-        const dx = mx - (cx / svgWidth) * (mx + window.innerWidth) + window.innerWidth / 2 - cx * (window.innerWidth / svgWidth - 1);
-        const dy = my - (cy / svgHeight) * (my + window.innerHeight) + window.innerHeight / 2 - cy * (window.innerHeight / svgHeight - 1);
+        const svgCursorX = (mx / (elWidth || svgWidth)) * svgWidth;
+        const svgCursorY = (my / (elHeight || svgHeight)) * svgHeight;
+        const dx = svgCursorX - cx;
+        const dy = svgCursorY - cy;
         return Math.sqrt(dx * dx + dy * dy);
       }
     );
@@ -176,13 +186,27 @@ const FloatingCard = ({
 
 export const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [elSize, setElSize] = React.useState({ w: 0, h: 0 });
   const cursorX = useMotionValue(-1);
   const cursorY = useMotionValue(-1);
 
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(() => {
+      setElSize({ w: el.offsetWidth, h: el.offsetHeight });
+    });
+    obs.observe(el);
+    setElSize({ w: el.offsetWidth, h: el.offsetHeight });
+    return () => obs.disconnect();
+  }, []);
+
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      cursorX.set(e.clientX - rect.left);
+      cursorY.set(e.clientY - rect.top);
     },
     [cursorX, cursorY]
   );
@@ -200,7 +224,7 @@ export const HeroSection = () => {
         onMouseLeave={handleMouseLeave}
         className="pointer-events-auto absolute inset-0 overflow-hidden"
       >
-        <ParticleField cursorX={cursorX} cursorY={cursorY} />
+        <ParticleField cursorX={cursorX} cursorY={cursorY} elWidth={elSize.w} elHeight={elSize.h} />
       </div>
 
       <div
@@ -287,21 +311,14 @@ export const HeroSection = () => {
               <div className="flex" style={{ height: 340 }}>
                 <div className="hidden w-72 shrink-0 bg-secondary/30 p-1.5 md:flex">
                   <div className="flex w-14 shrink-0 flex-col items-center gap-3 py-1.5 pr-1.5">
-                    <motion.div
-                      animate={{ y: [0, -3, 0] }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    >
+                    <div>
                       <Image
                         src="/logo.svg"
                         alt="Flowboard"
                         width={22}
                         height={22}
                       />
-                    </motion.div>
+                    </div>
                     <div className="flex flex-col items-center gap-2 mt-1">
                       <div className="p-2 rounded-lg hover:bg-accent flex flex-col align-middle justify-center text-[0.75rem] gap-1.5 font-medium items-center bg-background cursor-pointer">
                         <Clipboard className="size-4 text-foreground/70" />
