@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
@@ -18,14 +22,16 @@ export const Navbar = () => {
     };
   }, []);
 
+  const isDark = resolvedTheme === "dark";
+
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`fixed top-0 right-0 left-0 z-50 flex items-center justify-between px-6 py-4 transition-all md:px-12 lg:px-24 ${scrolled
-          ? "border-b border-border/50 bg-background/80 backdrop-blur-xl"
-          : "bg-transparent"
+        ? "border-b border-border/50 bg-background/80 backdrop-blur-xl"
+        : "bg-transparent"
         }`}
     >
       <div className="flex items-center gap-2.5">
@@ -52,12 +58,27 @@ export const Navbar = () => {
           Architecture
         </a>
       </div>
-      <Button asChild size="sm" className="gap-1.5">
-        <Link href="/app" target="_blank" rel="noopener noreferrer">
-          Launch App
-          <ArrowRight className="size-3.5" />
-        </Link>
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-9 cursor-pointer text-muted-foreground hover:text-foreground"
+          onClick={() => setTheme(isDark ? "light" : "dark")}
+          aria-label="Toggle theme"
+        >
+          {mounted && isDark ? (
+            <Sun className="size-4.5" />
+          ) : (
+            <Moon className="size-4.5" />
+          )}
+        </Button>
+        <Button asChild size="sm" className="gap-1.5 cursor-pointer">
+          <Link href="/app" target="_blank" rel="noopener noreferrer">
+            Launch App
+            <ArrowRight className="size-3.5" />
+          </Link>
+        </Button>
+      </div>
     </motion.nav>
   );
 };
