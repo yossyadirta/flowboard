@@ -141,7 +141,7 @@ export default function HomeDashboard() {
                               </span>
                             </CardTitle>
                             <CardDescription className="mt-1 text-xs md:text-sm">
-                              Key: {board.key}
+                              {board.key}
                             </CardDescription>
                           </div>
                         </CardHeader>
@@ -210,7 +210,7 @@ export default function HomeDashboard() {
                             {board.name}
                           </h3>
                           <p className="text-[10px] md:text-xs text-muted-foreground">
-                            Key: {board.key}
+                            {board.key}
                           </p>
                         </div>
                       </div>

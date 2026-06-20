@@ -55,15 +55,15 @@ export function ProjectStatusList({
                         {board.name}
                       </h3>
                       <p className="text-[10px] md:text-xs text-muted-foreground">
-                        Key: {board.key}
+                        {board.key}
                       </p>
                     </div>
                   </div>
                   <Badge
                     variant="secondary"
                     className={`text-[10px] md:text-xs shrink-0 ${isCompleted
-                        ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                        : "bg-slate-100 dark:bg-slate-800"
+                      ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                      : "bg-slate-100 dark:bg-slate-800"
                       }`}
                   >
                     {isCompleted ? "Completed" : "In Progress"}

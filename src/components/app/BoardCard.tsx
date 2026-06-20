@@ -40,7 +40,7 @@ export const BoardCard = ({
       </div>
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Key: {board.key}</span>
+        <span>{board.key}</span>
         {isFavorite && <span>{metrics.done + metrics.remaining} Tasks</span>}
       </div>
 
