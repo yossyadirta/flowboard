@@ -46,10 +46,10 @@ const TaskItem = ({
 
   const style = !isOverlay
     ? {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: activeId === data.id ? 0 : 1,
-      }
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: activeId === data.id ? 0 : 1,
+    }
     : undefined;
 
   const isMenuOpen =
@@ -64,9 +64,8 @@ const TaskItem = ({
       {...(!isOverlay ? listeners : {})}
     >
       <div
-        className={`absolute top-3 right-3 z-20 transition-opacity duration-200 ${
-          isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-        }`}
+        className={`absolute top-3 right-3 z-20 transition-opacity duration-200 ${isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
       >
         <OptionDropdown
           key={data.id}
@@ -95,7 +94,7 @@ const TaskItem = ({
         <div className="w-full relative">
           {data.cover.type === "color" && (
             <div
-              className="w-full h-14"
+              className="w-full h-2"
               style={{ backgroundColor: data.cover.value }}
             />
           )}
@@ -106,9 +105,8 @@ const TaskItem = ({
                 src={data.cover.value}
                 alt="Task Cover"
                 fill
-                className={`object-cover transition-opacity ${
-                  loading ? "opacity-0" : "opacity-100"
-                }`}
+                className={`object-cover transition-opacity ${loading ? "opacity-0" : "opacity-100"
+                  }`}
                 priority
                 onLoad={() => setLoading(false)}
               />
