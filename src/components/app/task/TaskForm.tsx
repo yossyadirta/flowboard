@@ -51,12 +51,12 @@ const COLORS = [
 ];
 
 const IMAGES = [
-  "/task-cover-1.jpg",
-  "/task-cover-2.jpg",
-  "/task-cover-3.jpg",
-  "/task-cover-4.jpg",
-  "/task-cover-5.jpg",
-  "/task-cover-6.jpg",
+  "/task-cover-1.webp",
+  "/task-cover-2.webp",
+  "/task-cover-3.webp",
+  "/task-cover-4.webp",
+  "/task-cover-5.webp",
+  "/task-cover-6.webp",
 ];
 
 type Props = {
